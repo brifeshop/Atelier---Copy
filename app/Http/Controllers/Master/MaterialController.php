@@ -17,6 +17,7 @@ class MaterialController extends BaseCrudController
 
     // ← TAMBAH kode_bahan & spesifikasi
     protected array $searchable = ['kode', 'kode_bahan', 'nama', 'spesifikasi', 'category', 'unit', 'location'];
+    protected array $sortable = ['kode', 'kode_bahan', 'nama', 'category', 'unit', 'price', 'current_stock', 'created_at'];
 
     protected array $validationRules = [
         'kode'              => 'required|string|max:50|unique:materials,kode',
@@ -53,6 +54,7 @@ class MaterialController extends BaseCrudController
     {
         $query = Material::with('supplier');
 
+        // Search
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
@@ -62,12 +64,15 @@ class MaterialController extends BaseCrudController
             });
         }
 
-        // Filter by costing method (bonus)
+        // Filter by costing method
         if ($request->filled('costing_method')) {
             $query->where('costing_method', $request->costing_method);
         }
 
-        $items = $query->latest()->paginate(15);
+        // Sorting — via helper
+        $this->applySorting($query, $request);
+
+        $items = $query->paginate(15);
 
         return view("{$this->viewPrefix}.index", [
             'items'         => $items,

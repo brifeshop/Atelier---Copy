@@ -68,12 +68,12 @@
                         <thead class="bg-navy-950/50 border-b border-navy-800">
                             <tr>
                                 <th class="px-4 py-3 text-left text-[10px] font-mono font-semibold text-navy-400 uppercase tracking-widest w-16">Foto</th>
-                                <th class="px-4 py-3 text-left text-[10px] font-mono font-semibold text-navy-400 uppercase tracking-widest">Kode</th>
-                                <th class="px-4 py-3 text-left text-[10px] font-mono font-semibold text-navy-400 uppercase tracking-widest">Nama</th>
+                                <x-sortable-header column="kode" label="Kode" align="left" />
+                                <x-sortable-header column="nama" label="Nama" align="left" />
                                 <th class="px-4 py-3 text-center text-[10px] font-mono font-semibold text-navy-400 uppercase tracking-widest">Costing</th>
-                                <th class="px-4 py-3 text-left text-[10px] font-mono font-semibold text-navy-400 uppercase tracking-widest">Kategori</th>
-                                <th class="px-4 py-3 text-right text-[10px] font-mono font-semibold text-navy-400 uppercase tracking-widest">Harga</th>
-                                <th class="px-4 py-3 text-right text-[10px] font-mono font-semibold text-navy-400 uppercase tracking-widest">Stok</th>
+                                <x-sortable-header column="category" label="Kategori" align="left" />
+                                <x-sortable-header column="price" label="Harga" align="right" />
+                                <x-sortable-header column="current_stock" label="Stok" align="right" />
                                 <th class="px-4 py-3 text-left text-[10px] font-mono font-semibold text-navy-400 uppercase tracking-widest">Status</th>
                                 <th class="px-4 py-3 text-right text-[10px] font-mono font-semibold text-navy-400 uppercase tracking-widest">Aksi</th>
                             </tr>
