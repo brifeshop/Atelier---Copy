@@ -47,10 +47,10 @@
                     <table class="w-full">
                         <thead class="bg-navy-950/50 border-b border-navy-800">
                             <tr>
-                                <th class="px-5 py-3 text-left text-[10px] font-mono font-semibold text-navy-400 uppercase tracking-widest">Kode</th>
-                                <th class="px-5 py-3 text-left text-[10px] font-mono font-semibold text-navy-400 uppercase tracking-widest">Nama</th>
-                                <th class="px-5 py-3 text-left text-[10px] font-mono font-semibold text-navy-400 uppercase tracking-widest">Kontak</th>
-                                <th class="px-5 py-3 text-left text-[10px] font-mono font-semibold text-navy-400 uppercase tracking-widest">Kota</th>
+                                <x-sortable-header column="kode" label="Kode" align="left" />
+                                <x-sortable-header column="nama" label="Nama" align="left" />
+                                <x-sortable-header column="contact_person" label="Kontak" align="left" />
+                                <x-sortable-header column="city" label="Kota" align="left" />
                                 <th class="px-5 py-3 text-left text-[10px] font-mono font-semibold text-navy-400 uppercase tracking-widest">Status</th>
                                 <th class="px-5 py-3 text-right text-[10px] font-mono font-semibold text-navy-400 uppercase tracking-widest">Aksi</th>
                             </tr>
@@ -106,7 +106,7 @@
                 {{-- Pagination --}}
                 @if($items->hasPages())
                     <div class="px-5 py-4 border-t border-navy-800">
-                        {{ $items->links() }}
+                        {{ $items->withQueryString()->links() }}
                     </div>
                 @endif
             @else

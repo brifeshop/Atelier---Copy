@@ -8,10 +8,16 @@ use App\Models\Warehouse\Location;
 use App\Models\Warehouse\Warehouse;
 use App\Models\Master\Material;
 use App\Models\Master\Product;
+use App\Traits\Sortable;
 use Illuminate\Http\Request;
 
 class InventoryController extends Controller
 {
+    use Sortable;
+
+    protected array $sortable = ['qty', 'min_stock', 'max_stock', 'last_movement_at', 'created_at'];
+    protected string $orderColumn = 'last_movement_at';
+
     /**
      * List semua inventory
      */
@@ -47,7 +53,10 @@ class InventoryController extends Controller
                 });
             }
 
-            $items = $query->latest('last_movement_at')->paginate(15);
+            $this->applySorting($query, $request);
+                $query->orderBy('id', 'desc');
+
+                $items = $query->paginate(15)->withQueryString();
 
             // Hitung total value dari SEMUA inventory (bukan cuma yang di halaman ini)
             $totalValue = 0;

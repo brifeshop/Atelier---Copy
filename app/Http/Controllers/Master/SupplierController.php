@@ -14,6 +14,7 @@ class SupplierController extends BaseCrudController
     protected string $title = 'Supplier';
 
     protected array $searchable = ['kode', 'nama', 'pic_name', 'phone', 'email', 'city'];
+protected array $sortable = ['kode', 'nama', 'pic_name', 'city', 'rating', 'created_at'];
 
     protected array $validationRules = [
         'kode' => 'required|string|max:50|unique:suppliers,kode',

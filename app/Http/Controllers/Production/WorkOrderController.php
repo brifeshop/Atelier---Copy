@@ -9,6 +9,7 @@ use App\Models\Engineering\Routing;
 use App\Models\Master\Product;
 use App\Models\Sales\SalesOrder;
 use App\Services\WorkOrderService;
+use App\Traits\Sortable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Services\CostingService;
@@ -16,6 +17,21 @@ use App\Models\Production\CostSnapshot;
 
 class WorkOrderController extends Controller
 {
+    use Sortable;
+
+    protected array $sortable = [
+        'wo_number',
+        'planned_qty',
+        'actual_qty',
+        'start_date',
+        'end_date',
+        'status',
+        'priority',
+        'created_at',
+    ];
+
+    protected string $orderColumn = 'start_date';
+
     public function index(Request $request)
     {
         $query = WorkOrder::with(['product', 'creator']);
@@ -40,7 +56,10 @@ class WorkOrderController extends Controller
             });
         }
 
-        $items = $query->latest('start_date')->latest('id')->paginate(20)->withQueryString();
+        $this->applySorting($query, $request);
+        $query->orderBy('id', 'desc');
+
+        $items = $query->paginate(20)->withQueryString();
 
         $stats = [
             'total'       => WorkOrder::count(),

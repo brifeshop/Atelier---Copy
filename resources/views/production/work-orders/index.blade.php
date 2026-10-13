@@ -94,12 +94,12 @@
                     <table class="w-full">
                         <thead class="bg-navy-950/50 border-b border-navy-800">
                             <tr>
-                                <th class="px-5 py-3 text-left text-[10px] font-mono font-semibold text-navy-400 uppercase tracking-widest">No. WO</th>
+                                <x-sortable-header column="wo_number" label="No. WO" align="left" />
                                 <th class="px-5 py-3 text-left text-[10px] font-mono font-semibold text-navy-400 uppercase tracking-widest">Produk</th>
-                                <th class="px-5 py-3 text-right text-[10px] font-mono font-semibold text-navy-400 uppercase tracking-widest">Qty</th>
-                                <th class="px-5 py-3 text-left text-[10px] font-mono font-semibold text-navy-400 uppercase tracking-widest">Jadwal</th>
-                                <th class="px-5 py-3 text-center text-[10px] font-mono font-semibold text-navy-400 uppercase tracking-widest">Prioritas</th>
-                                <th class="px-5 py-3 text-center text-[10px] font-mono font-semibold text-navy-400 uppercase tracking-widest">Status</th>
+                                <x-sortable-header column="planned_qty" label="Qty" align="right" />
+                                <x-sortable-header column="start_date" label="Jadwal" align="left" />
+                                <x-sortable-header column="priority" label="Prioritas" align="center" />
+                                <x-sortable-header column="status" label="Status" align="center" />
                                 <th class="px-5 py-3 text-left text-[10px] font-mono font-semibold text-navy-400 uppercase tracking-widest">Progress</th>
                                 <th class="px-5 py-3 text-right text-[10px] font-mono font-semibold text-navy-400 uppercase tracking-widest">Aksi</th>
                             </tr>

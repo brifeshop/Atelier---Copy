@@ -14,6 +14,7 @@ class CustomerController extends BaseCrudController
     protected string $title = 'Customer';
 
     protected array $searchable = ['kode', 'nama', 'contact_person', 'phone', 'email', 'city'];
+protected array $sortable = ['kode', 'nama', 'contact_person', 'city', 'created_at'];
 
     protected array $validationRules = [
         'kode' => 'required|string|max:50|unique:customers,kode',
