@@ -38,7 +38,14 @@
                         </select>
                     </div>
 
-                    <x-atelier.input name="kode" label="Kode Location" :value="$item->kode" required />
+                    <x-atelier.input 
+                        name="kode" 
+                        label="Kode Location" 
+                        :value="old('kode', $item->kode)" 
+                        placeholder="INC-R04-LV3"
+                        required
+                        hint="Kode boleh custom" 
+                    />
                     <x-atelier.input name="nama" label="Nama Location" :value="$item->nama" required />
                     <x-atelier.input name="capacity" label="Capacity" type="number" step="0.01" :value="$item->capacity" />
                 </div>

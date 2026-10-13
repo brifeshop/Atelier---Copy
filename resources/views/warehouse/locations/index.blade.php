@@ -5,13 +5,21 @@
 
     <div class="p-6 lg:p-8 space-y-6 grid-bg">
 
+        <div class="flex items-start justify-between flex-wrap gap-4">
         <x-atelier.page-header
             segment="M4A"
             title="Location"
             subtitle="Daftar rak / lokasi penyimpanan"
-            action="Tambah Location"
-            :actionUrl="route('warehouse.locations.create')"
         />
+        <div class="flex gap-2">
+            <x-atelier.button :href="route('warehouse.locations.bulk')" variant="secondary">
+                📋 Input Masal
+            </x-atelier.button>
+            <x-atelier.button :href="route('warehouse.locations.create')" variant="primary">
+                + Tambah Location
+            </x-atelier.button>
+        </div>
+    </div>
 
         @if(session('success'))
             <div class="bg-green-500/10 border border-green-500/30 text-green-400 px-4 py-3 rounded-lg text-sm">
@@ -49,11 +57,11 @@
                     <table class="w-full">
                         <thead class="bg-navy-950/50 border-b border-navy-800">
                             <tr>
-                                <th class="px-5 py-3 text-left text-[10px] font-mono font-semibold text-navy-400 uppercase tracking-widest">Kode</th>
-                                <th class="px-5 py-3 text-left text-[10px] font-mono font-semibold text-navy-400 uppercase tracking-widest">Nama</th>
+                                <x-sortable-header column="kode" label="Kode" align="left" />
+                                <x-sortable-header column="nama" label="Nama" align="left" />
                                 <th class="px-5 py-3 text-left text-[10px] font-mono font-semibold text-navy-400 uppercase tracking-widest">Warehouse</th>
-                                <th class="px-5 py-3 text-right text-[10px] font-mono font-semibold text-navy-400 uppercase tracking-widest">Capacity</th>
-                                <th class="px-5 py-3 text-left text-[10px] font-mono font-semibold text-navy-400 uppercase tracking-widest">Status</th>
+                                <x-sortable-header column="capacity" label="Capacity" align="right" />
+                                <x-sortable-header column="is_active" label="Status" align="left" />
                                 <th class="px-5 py-3 text-right text-[10px] font-mono font-semibold text-navy-400 uppercase tracking-widest">Aksi</th>
                             </tr>
                         </thead>
@@ -98,7 +106,7 @@
 
                 @if($items->hasPages())
                     <div class="px-5 py-4 border-t border-navy-800">
-                        {{ $items->links() }}
+                        {{ $items->withQueryString()->links() }}
                     </div>
                 @endif
             @else

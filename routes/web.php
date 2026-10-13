@@ -90,10 +90,15 @@ Route::middleware(['auth', 'verified'])->prefix('sales')->name('sales.')->group(
 // ==================== WAREHOUSE ====================
 Route::middleware(['auth', 'verified'])->prefix('warehouse')->name('warehouse.')->group(function () {
     Route::resource('warehouses', WarehouseController::class);
+
+    // ← TARUH DI SINI (SEBELUM resource locations)
+    Route::get('locations/bulk', [LocationController::class, 'bulkForm'])->name('locations.bulk');
+    Route::post('locations/bulk-store', [LocationController::class, 'bulkStore'])->name('locations.bulk-store');
+
     Route::resource('locations', LocationController::class);
     Route::resource('inventories', InventoryController::class)->only(['index', 'show', 'update']);
 
-    // Stock Movements — custom routes HARUS sebelum resource
+    // Stock Movements — custom routes SEBELUM resource
     Route::get('stock-movements/adjustments', [StockMovementController::class, 'adjustments'])
         ->name('stock-movements.adjustments');
     Route::get('stock-movements/get-stock', [StockMovementController::class, 'getStock'])

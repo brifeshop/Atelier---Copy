@@ -7,18 +7,19 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 abstract class BaseCrudController extends Controller
-{
-    protected string $model;
-    protected string $viewPrefix;
-    protected string $routePrefix;
-    protected string $title;
+    {
+        protected string $model;
+        protected string $viewPrefix;
+        protected string $routePrefix;
+        protected string $title;
 
-    protected array $searchable = [];
-    protected array $validationRules = [];
-    protected array $relations = [];
-    protected int $perPage = 15;
-    protected string $orderBy = 'latest';
-    protected string $orderColumn = 'created_at';
+        protected array $searchable = [];
+        protected array $sortable = [];           // ← TAMBAH: whitelist kolom yang bisa di-sort
+        protected array $validationRules = [];
+        protected array $relations = [];
+        protected int $perPage = 15;
+        protected string $orderBy = 'latest';
+        protected string $orderColumn = 'created_at';
 
     /**
      * List semua data
@@ -42,11 +43,21 @@ abstract class BaseCrudController extends Controller
         }
 
         // Order
-        if ($this->orderBy === 'latest') {
-            $query->latest($this->orderColumn);
-        } else {
-            $query->orderBy($this->orderColumn, $this->orderBy);
+        // Sorting (custom dari query string, atau default)
+        $sortColumn = $request->get('sort', $this->orderColumn);
+        $sortDirection = $request->get('direction', 'desc');
+
+        // Whitelist kolom yang boleh di-sort
+        $allowedSorts = $this->sortable ?? [$this->orderColumn];
+        if (!in_array($sortColumn, $allowedSorts)) {
+            $sortColumn = $this->orderColumn;
         }
+
+        if (!in_array($sortDirection, ['asc', 'desc'])) {
+            $sortDirection = 'desc';
+        }
+
+        $query->orderBy($sortColumn, $sortDirection);
 
         $items = $query->paginate($this->perPage);
 
@@ -285,5 +296,30 @@ abstract class BaseCrudController extends Controller
         }
 
         return $references;
+    }
+
+    /**
+     * Apply sorting dari query string
+     * 
+     * @param  \Illuminate\Database\Eloquent\Builder $query
+     * @param  Request $request
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    protected function applySorting($query, Request $request)
+    {
+        $sortColumn = $request->get('sort', $this->orderColumn);
+        $sortDirection = $request->get('direction', 'desc');
+
+        // Whitelist kolom yang boleh di-sort
+        $allowedSorts = $this->sortable ?? [$this->orderColumn];
+        if (!in_array($sortColumn, $allowedSorts)) {
+            $sortColumn = $this->orderColumn;
+        }
+
+        if (!in_array($sortDirection, ['asc', 'desc'])) {
+            $sortDirection = 'desc';
+        }
+
+        return $query->orderBy($sortColumn, $sortDirection);
     }
 }

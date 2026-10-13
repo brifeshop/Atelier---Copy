@@ -38,7 +38,13 @@
                         </select>
                     </div>
 
-                    <x-atelier.input name="kode" label="Kode Location" :value="$generatedKode" required hint="Auto-generate dari warehouse, bisa diubah" />
+                    <x-atelier.input 
+                        name="kode" 
+                        label="Kode Location" 
+                        :value="old('kode', $generatedKode)" 
+                        placeholder="INC-R04-LV3 atau kosongkan untuk auto-generate" 
+                        hint="Boleh custom (INC-R04-LV3) atau kosongkan untuk auto-generate" 
+                    />
                     <x-atelier.input name="nama" label="Nama Location" placeholder="Rak A-01" required />
                     <x-atelier.input name="capacity" label="Capacity" type="number" step="0.01" placeholder="1000" hint="Opsional, dalam unit" />
                 </div>

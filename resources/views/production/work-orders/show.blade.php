@@ -271,8 +271,12 @@
                 @endif
                 
                 @if($item->status === 'in_progress')
-                    <x-atelier.button :href="route('production.work-orders.progress', $item)" variant="primary">
+                    <x-atelier.button :href="route('production.work-orders.progress', $item)" variant="secondary">
                         📝 Input Progress
+                    </x-atelier.button>
+                    
+                    <x-atelier.button :href="route('production.finished-goods.create', ['work_order_id' => $item->id])" variant="primary">
+                        📦 Terima Produk Jadi
                     </x-atelier.button>
                 @endif
 
