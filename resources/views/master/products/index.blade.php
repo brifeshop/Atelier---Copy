@@ -42,11 +42,11 @@
                         <thead class="bg-navy-950/50 border-b border-navy-800">
                             <tr>
                                 <th class="px-5 py-3 text-left text-[10px] font-mono font-semibold text-navy-400 uppercase tracking-widest w-16">Foto</th>
-                                <th class="px-5 py-3 text-left text-[10px] font-mono font-semibold text-navy-400 uppercase tracking-widest">Kode</th>
-                                <th class="px-5 py-3 text-left text-[10px] font-mono font-semibold text-navy-400 uppercase tracking-widest">Nama</th>
-                                <th class="px-5 py-3 text-left text-[10px] font-mono font-semibold text-navy-400 uppercase tracking-widest">Kategori</th>
-                                <th class="px-5 py-3 text-left text-[10px] font-mono font-semibold text-navy-400 uppercase tracking-widest">Satuan</th>
-                                <th class="px-5 py-3 text-right text-[10px] font-mono font-semibold text-navy-400 uppercase tracking-widest">Harga Jual</th>
+                                <x-sortable-header column="kode" label="Kode" align="left" />
+                                <x-sortable-header column="nama" label="Nama" align="left" />
+                                <x-sortable-header column="category" label="Kategori" align="left" />
+                                <x-sortable-header column="unit" label="Satuan" align="left" />
+                                <x-sortable-header column="selling_price" label="Harga Jual" align="right" />
                                 <th class="px-5 py-3 text-left text-[10px] font-mono font-semibold text-navy-400 uppercase tracking-widest">Status</th>
                                 <th class="px-5 py-3 text-right text-[10px] font-mono font-semibold text-navy-400 uppercase tracking-widest">Aksi</th>
                             </tr>
@@ -104,7 +104,7 @@
 
                 @if($items->hasPages())
                     <div class="px-5 py-4 border-t border-navy-800">
-                        {{ $items->links() }}
+                        {{ $items->withQueryString()->links() }}
                     </div>
                 @endif
             @else

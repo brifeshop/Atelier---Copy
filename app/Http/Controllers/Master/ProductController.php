@@ -15,6 +15,7 @@ class ProductController extends BaseCrudController
     protected string $title = 'Product';
 
     protected array $searchable = ['kode', 'nama', 'category', 'unit'];
+    protected array $sortable = ['kode', 'nama', 'category', 'unit', 'selling_price', 'created_at'];
 
     protected array $validationRules = [
         'kode' => 'required|string|max:50|unique:products,kode',
