@@ -8,30 +8,52 @@ use App\Models\Purchasing\PurchaseOrderItem;
 use App\Models\Purchasing\PurchaseRequisition;
 use App\Models\Master\Supplier;
 use App\Models\Master\Material;
+use App\Traits\Sortable;   // ← TAMBAH
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class PurchaseOrderController extends Controller
 {
+    use Sortable;   // ← TAMBAH
+
+    protected array $sortable = [
+        'po_number',
+        'date',
+        'delivery_date',
+        'total_amount',
+        'status',
+        'created_at',
+    ];
+
+    protected string $orderColumn = 'date';   // ← Default sort column
+
     public function index(Request $request)
     {
         $query = PurchaseOrder::with(['supplier', 'createdBy']);
 
+        // Filter status
         if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
 
+        // Search
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('po_number', 'like', "%{$search}%")
-                  ->orWhereHas('supplier', function ($q2) use ($search) {
-                      $q2->where('nama', 'like', "%{$search}%");
-                  });
+                ->orWhereHas('supplier', function ($q2) use ($search) {
+                    $q2->where('nama', 'like', "%{$search}%");
+                });
             });
         }
 
-        $items = $query->latest('date')->latest('id')->paginate(15);
+        // Sorting — via trait
+        $this->applySorting($query, $request);
+
+        // Secondary sort by id untuk konsistensi
+        $query->orderBy('id', 'desc');
+
+        $items = $query->paginate(15)->withQueryString();
 
         $stats = [
             'total' => PurchaseOrder::count(),

@@ -77,11 +77,11 @@
                     <table class="w-full">
                         <thead class="bg-navy-950/50 border-b border-navy-800">
                             <tr>
-                                <th class="px-5 py-3 text-left text-[10px] font-mono font-semibold text-navy-400 uppercase tracking-widest">No. SO</th>
+                                <x-sortable-header column="so_number" label="No. SO" align="left" />
                                 <th class="px-5 py-3 text-left text-[10px] font-mono font-semibold text-navy-400 uppercase tracking-widest">Customer</th>
-                                <th class="px-5 py-3 text-left text-[10px] font-mono font-semibold text-navy-400 uppercase tracking-widest">Tanggal</th>
-                                <th class="px-5 py-3 text-right text-[10px] font-mono font-semibold text-navy-400 uppercase tracking-widest">Total</th>
-                                <th class="px-5 py-3 text-left text-[10px] font-mono font-semibold text-navy-400 uppercase tracking-widest">Status</th>
+                                <x-sortable-header column="order_date" label="Tanggal" align="left" />
+                                <x-sortable-header column="total_amount" label="Total" align="right" />
+                                <x-sortable-header column="status" label="Status" align="left" />
                                 <th class="px-5 py-3 text-right text-[10px] font-mono font-semibold text-navy-400 uppercase tracking-widest">Aksi</th>
                             </tr>
                         </thead>
@@ -137,7 +137,7 @@
 
                 @if($items->hasPages())
                     <div class="px-5 py-4 border-t border-navy-800">
-                        {{ $items->links() }}
+                        {{ $items->withQueryString()->links() }}
                     </div>
                 @endif
             @else

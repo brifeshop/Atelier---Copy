@@ -8,12 +8,26 @@ use App\Models\Master\Employee;
 use App\Models\Master\Product;
 use App\Models\Sales\SalesOrder;
 use App\Models\Sales\SalesOrderItem;
+use App\Traits\Sortable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Services\SalesOrderStatusService;
 
 class SalesOrderController extends Controller
 {
+    use Sortable;
+
+    protected array $sortable = [
+        'so_number',
+        'order_date',
+        'delivery_date',
+        'total_amount',
+        'status',
+        'created_at',
+    ];
+
+    protected string $orderColumn = 'order_date';
+
     /**
      * List SO
      */
@@ -31,14 +45,18 @@ class SalesOrderController extends Controller
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('so_number', 'like', "%{$search}%")
-                  ->orWhereHas('customer', function ($q2) use ($search) {
-                      $q2->where('nama', 'like', "%{$search}%")
-                         ->orWhere('kode', 'like', "%{$search}%");
-                  });
+                ->orWhereHas('customer', function ($q2) use ($search) {
+                    $q2->where('nama', 'like', "%{$search}%")
+                        ->orWhere('kode', 'like', "%{$search}%");
+                });
             });
         }
 
-        $items = $query->latest('order_date')->latest('id')->paginate(15);
+        // Sorting — via trait
+        $this->applySorting($query, $request);
+        $query->orderBy('id', 'desc');
+
+        $items = $query->paginate(15)->withQueryString();
 
         // Stats
         $stats = [
