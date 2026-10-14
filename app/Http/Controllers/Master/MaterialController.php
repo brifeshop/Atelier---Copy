@@ -6,10 +6,13 @@ use App\Http\Controllers\BaseCrudController;
 use App\Models\Master\Material;
 use App\Models\Master\Supplier;
 use App\Helpers\UploadHelper;
+use App\Traits\BulkStoreable;
 use Illuminate\Http\Request;
 
 class MaterialController extends BaseCrudController
 {
+    use BulkStoreable;
+
     protected string $model = Material::class;
     protected string $viewPrefix = 'master.materials';
     protected string $routePrefix = 'master.materials';
@@ -295,4 +298,88 @@ class MaterialController extends BaseCrudController
             ], 500);
         }
     }
+    // ============ BULK INPUT ============
+
+    /**
+     * Form bulk — copy-paste dari Excel
+     */
+    public function bulkForm()
+    {
+        return view('master.materials.bulk');
+    }
+
+    /**
+     * Proses bulk store — pakai trait universal
+     */
+    public function bulkStore(Request $request)
+    {
+        return $this->bulkStoreGeneric(
+            request: $request,
+            modelClass: Material::class,
+            rules: [
+                'kode'              => 'nullable|string|max:50',
+                'kode_bahan'        => 'nullable|string|max:50',
+                'nama'              => 'required|string|max:255',
+                'spesifikasi'       => 'nullable|string',
+                'category'          => 'nullable|string|max:100',
+                'unit'              => 'required|string|max:20',
+                'costing_method'    => 'required|in:per_unit,per_area,per_volume,per_length,per_weight',
+                'panjang_standar'   => 'nullable|numeric|min:0',
+                'lebar_standar'     => 'nullable|numeric|min:0',
+                'tinggi_standar'    => 'nullable|numeric|min:0',
+                'berat_standar'     => 'nullable|numeric|min:0',
+                'volume_standar'    => 'nullable|numeric|min:0',
+                'volume_type'       => 'nullable|in:kotak,cair',
+                'price'             => 'nullable|numeric|min:0',
+                'yield_percent'     => 'nullable|numeric|min:0|max:100',
+                'min_stock'         => 'nullable|numeric|min:0',
+                'max_stock'         => 'nullable|numeric|min:0',
+                'location'          => 'nullable|string|max:100',
+                'notes'             => 'nullable|string',
+            ],
+            beforeCreate: function ($data, $request) {
+                // Auto-generate kode kalau kosong
+                $kode = !empty($data['kode']) 
+                        ? $data['kode'] 
+                        : Material::generateKode();
+
+                // Cek duplikat kode
+                if (!empty($data['kode'])) {
+                    $exists = Material::where('kode', $data['kode'])->exists();
+                    if ($exists) {
+                        throw new \Exception("Kode '{$data['kode']}' sudah ada.");
+                    }
+                }
+
+                // Default values
+                $data['yield_percent'] = $data['yield_percent'] ?? 100;
+
+                // Reset dimensi kalau per_unit
+                if (($data['costing_method'] ?? 'per_unit') === 'per_unit') {
+                    $data['panjang_standar'] = null;
+                    $data['lebar_standar'] = null;
+                    $data['tinggi_standar'] = null;
+                    $data['berat_standar'] = null;
+                    $data['volume_standar'] = null;
+                    $data['volume_type'] = null;
+                }
+
+                // Reset volume cair kalau bukan per_volume
+                if (($data['costing_method'] ?? 'per_unit') !== 'per_volume') {
+                    $data['volume_type'] = null;
+                    $data['volume_standar'] = null;
+                }
+
+                return array_merge($data, [
+                    'kode'      => $kode,
+                    'is_active' => true,
+                ]);
+            },
+            uniqueCheck: function ($data, $request) {
+                return Material::where('nama', $data['nama'])->exists();
+            },
+            redirectRoute: 'master.materials.index',
+        );
+    }
+
 }

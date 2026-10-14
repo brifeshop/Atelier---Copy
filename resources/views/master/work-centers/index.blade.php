@@ -5,13 +5,21 @@
 
     <div class="p-6 lg:p-8 space-y-6 grid-bg">
 
-        <x-atelier.page-header
-            segment="M2"
-            title="Master Work Center"
-            subtitle="Daftar semua stasiun kerja"
-            action="Tambah Work Center"
-            :actionUrl="route('master.work-centers.create')"
-        />
+        <div class="flex items-start justify-between flex-wrap gap-4">
+            <x-atelier.page-header
+                segment="M2"
+                title="Master Work Center"
+                subtitle="Daftar semua stasiun kerja"
+            />
+            <div class="flex gap-2">
+                <x-atelier.button :href="route('master.work-centers.bulk')" variant="secondary">
+                    📋 Input Masal
+                </x-atelier.button>
+                <x-atelier.button :href="route('master.work-centers.create')" variant="primary">
+                    + Tambah Work Center
+                </x-atelier.button>
+            </div>
+        </div>
 
         @if(session('success'))
             <div class="bg-green-500/10 border border-green-500/30 text-green-400 px-4 py-3 rounded-lg text-sm">

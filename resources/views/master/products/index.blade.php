@@ -5,13 +5,21 @@
 
     <div class="p-6 lg:p-8 space-y-6 grid-bg">
 
-        <x-atelier.page-header
-            segment="M2"
-            title="Master Product"
-            subtitle="Daftar semua produk jadi"
-            action="Tambah Product"
-            :actionUrl="route('master.products.create')"
-        />
+        <div class="flex items-start justify-between flex-wrap gap-4">
+            <x-atelier.page-header
+                segment="M2"
+                title="Master Product"
+                subtitle="Daftar semua produk jadi"
+            />
+            <div class="flex gap-2">
+                <x-atelier.button :href="route('master.products.bulk')" variant="secondary">
+                    📋 Input Masal
+                </x-atelier.button>
+                <x-atelier.button :href="route('master.products.create')" variant="primary">
+                    + Tambah Product
+                </x-atelier.button>
+            </div>
+        </div>
 
         @if(session('success'))
             <div class="bg-green-500/10 border border-green-500/30 text-green-400 px-4 py-3 rounded-lg text-sm">

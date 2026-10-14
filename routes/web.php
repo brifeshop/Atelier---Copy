@@ -62,6 +62,11 @@ Route::middleware(['auth', 'verified'])->prefix('master')->name('master.')->grou
     Route::resource('suppliers', SupplierController::class);
     Route::resource('employees', EmployeeController::class);
     Route::resource('machines', MachineController::class);
+    Route::get('products/bulk', [ProductController::class, 'bulkForm'])->name('products.bulk');
+    Route::post('products/bulk-store', [ProductController::class, 'bulkStore'])->name('products.bulk-store');
+    Route::get('work-centers/bulk', [WorkCenterController::class, 'bulkForm'])->name('work-centers.bulk');
+    Route::post('work-centers/bulk-store', [WorkCenterController::class, 'bulkStore'])->name('work-centers.bulk-store');
+    Route::resource('work-centers', WorkCenterController::class);
 
     // ============ MATERIAL CUSTOM ROUTES ============
     Route::prefix('materials')->name('materials.')->group(function () {
@@ -70,6 +75,9 @@ Route::middleware(['auth', 'verified'])->prefix('master')->name('master.')->grou
         Route::get('import/template', [MaterialImportController::class, 'template'])->name('import.template');
         Route::post('import/preview', [MaterialImportController::class, 'preview'])->name('import.preview');
         Route::post('import/store', [MaterialImportController::class, 'store'])->name('import.store');
+
+        Route::get('bulk', [MaterialController::class, 'bulkForm'])->name('bulk');
+    Route::post('bulk-store', [MaterialController::class, 'bulkStore'])->name('bulk-store');
 
         // Quick Store (dari halaman BOM)
         Route::post('quick-store', [MaterialController::class, 'quickStore'])->name('quick-store');

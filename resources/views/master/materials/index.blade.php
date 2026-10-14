@@ -12,9 +12,12 @@
                 title="Master Material"
                 subtitle="Daftar semua bahan baku"
             />
-            <div class="flex gap-2">
+            <div class="flex gap-2 flex-wrap">
                 <x-atelier.button :href="route('master.materials.import')" variant="secondary">
                     ⬆️ Import CSV
+                </x-atelier.button>
+                <x-atelier.button :href="route('master.materials.bulk')" variant="secondary">
+                    📋 Input Masal
                 </x-atelier.button>
                 <x-atelier.button :href="route('master.materials.create')" variant="primary">
                     + Tambah Material
