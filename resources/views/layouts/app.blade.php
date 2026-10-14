@@ -137,7 +137,15 @@
 
                             // Lainnya
                             ['route' => null, 'label' => 'Laporan', 'icon' => 'M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z', 'group' => 'Lainnya'],
-                            ['route' => null, 'label' => 'Pengaturan', 'icon' => 'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z', 'group' => 'Lainnya'],
+                            [
+                                'label' => 'Pengaturan',
+                                'icon' => 'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z',
+                                'group' => 'Lainnya',
+                                'submenu' => [
+                                    ['route' => 'settings.users.index', 'label' => 'Users'],
+                                    ['route' => null, 'label' => 'Roles'],
+                                ],
+                            ],
                         ];
                     @endphp
 
@@ -150,62 +158,144 @@
                                  x-transition:enter-start="opacity-0"
                                  x-transition:enter-end="opacity-100"
                                  class="pt-4 pb-2 px-3">
-                                <p class="text-[10px] font-semibold text-navy-500 uppercase tracking-widest">{{ $item['group'] }}</p>
+                                 <p class="text-[10px] font-semibold text-navy-500 uppercase tracking-widest">{{ $item['group'] }}</p>
                             </div>
                             <div x-show="!sidebarOpen" class="pt-3"></div>
                         @endif
 
-                        @php
-                            $isActive = $item['route'] && request()->routeIs($item['route'] . '*');
-                        @endphp
+                        @if(isset($item['submenu']))
+                            {{-- Dropdown Menu --}}
+                            @php
+                                $hasSubActive = false;
+                                foreach ($item['submenu'] as $sub) {
+                                    if ($sub['route'] && request()->routeIs($sub['route'] . '*')) {
+                                        $hasSubActive = true;
+                                        break;
+                                    }
+                                }
+                            @endphp
 
-                        <a href="{{ $item['route'] ? route($item['route']) : '#' }}"
-                            class="group relative flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200
-                                    {{ $isActive 
-                                        ? 'bg-gold-500 text-navy-900 shadow-lg shadow-gold-500/20' 
-                                        : 'text-navy-300 hover:text-white hover:bg-navy-800' }}"
-                            :class="!sidebarOpen && 'justify-center'">
-                                
-                                {{-- Active Indicator Bar --}}
-                                @if($isActive)
-                                    <div class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-navy-900 rounded-r-full -ml-3"></div>
-                                @endif
+                            <div x-data="{ open: {{ $hasSubActive ? 'true' : 'false' }} }" class="relative">
+                                <button @click="open = !open" 
+                                    type="button"
+                                    class="w-full group relative flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200
+                                            {{ $hasSubActive 
+                                                ? 'bg-navy-800 text-gold-400 font-semibold' 
+                                                : 'text-navy-300 hover:text-white hover:bg-navy-800' }}"
+                                    :class="!sidebarOpen && 'justify-center'">
+                                    
+                                    @if($hasSubActive)
+                                        <div class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-gold-500 rounded-r-full -ml-3"></div>
+                                    @endif
 
-                                <!-- Icon -->
-                                <svg class="w-5 h-5 flex-shrink-0 {{ $isActive ? 'stroke-[2.5]' : '' }}" 
-                                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $item['icon'] }}"/>
-                                </svg>
+                                    <!-- Icon -->
+                                    <svg class="w-5 h-5 flex-shrink-0 {{ $hasSubActive ? 'text-gold-500' : '' }}" 
+                                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $item['icon'] }}"/>
+                                    </svg>
 
-                                <!-- Label -->
-                                <span x-show="sidebarOpen"
-                                    x-transition:enter="transition ease-out duration-200"
-                                    x-transition:enter-start="opacity-0 -translate-x-2"
-                                    x-transition:enter-end="opacity-100 translate-x-0"
-                                    class="text-sm font-medium whitespace-nowrap overflow-hidden">
-                                    {{ $item['label'] }}
-                                </span>
-
-                                {{-- Badge Low Stock --}}
-                                @if($item['route'] === 'warehouse.low-stocks.index' && $lowStockCount > 0)
+                                    <!-- Label -->
                                     <span x-show="sidebarOpen"
-                                        class="ml-auto inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 text-[10px] font-bold rounded-full bg-red-500 text-white">
-                                        {{ $lowStockCount }}
+                                        x-transition:enter="transition ease-out duration-200"
+                                        x-transition:enter-start="opacity-0 -translate-x-2"
+                                        x-transition:enter-end="opacity-100 translate-x-0"
+                                        class="text-sm font-medium whitespace-nowrap overflow-hidden flex-1 text-left">
+                                        {{ $item['label'] }}
                                     </span>
-                                @endif
 
-                                <!-- Tooltip (saat collapsed) -->
-                                <div x-show="!sidebarOpen"
-                                    class="absolute left-full ml-3 px-3 py-1.5 bg-navy-800 text-white text-xs font-medium rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap transition-opacity z-50 shadow-xl border border-navy-700">
-                                    {{ $item['label'] }}
+                                    <!-- Chevron -->
+                                    <svg x-show="sidebarOpen" 
+                                        class="w-4 h-4 text-navy-400 transition-transform duration-200 flex-shrink-0"
+                                        :class="open ? 'rotate-180 text-gold-500' : ''"
+                                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                    </svg>
+
+                                    <!-- Tooltip (saat collapsed) -->
+                                    <div x-show="!sidebarOpen"
+                                        class="absolute left-full ml-3 px-3 py-1.5 bg-navy-800 text-white text-xs font-medium rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap transition-opacity z-50 shadow-xl border border-navy-700">
+                                        {{ $item['label'] }}
+                                        <div class="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1 w-2 h-2 bg-navy-800 rotate-45 border-l border-b border-navy-700"></div>
+                                    </div>
+                                </button>
+
+                                <!-- Submenu Links -->
+                                <div x-show="open && sidebarOpen" 
+                                     x-transition:enter="transition ease-out duration-150"
+                                     x-transition:enter-start="opacity-0 -translate-y-1"
+                                     x-transition:enter-end="opacity-100 translate-y-0"
+                                     class="pl-8 pr-2 py-1 space-y-1">
+                                    @foreach($item['submenu'] as $subItem)
+                                        @php
+                                            $isSubActive = $subItem['route'] && request()->routeIs($subItem['route'] . '*');
+                                        @endphp
+                                        <a href="{{ $subItem['route'] ? route($subItem['route']) : '#' }}"
+                                           class="flex items-center justify-between px-3 py-1.5 rounded-lg text-xs font-medium transition
+                                                  {{ $isSubActive 
+                                                      ? 'bg-gold-500 text-navy-900 font-bold shadow-sm' 
+                                                      : ($subItem['route'] ? 'text-navy-300 hover:text-white hover:bg-navy-800/60' : 'text-navy-500 cursor-not-allowed') }}">
+                                            <span>{{ $subItem['label'] }}</span>
+                                            @if(!$subItem['route'])
+                                                <span class="text-[9px] uppercase tracking-wider px-1 py-0.5 rounded bg-navy-800 text-navy-500 border border-navy-700">Nanti</span>
+                                            @endif
+                                        </a>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @else
+                            {{-- Standard Menu Item --}}
+                            @php
+                                $isActive = $item['route'] && request()->routeIs($item['route'] . '*');
+                            @endphp
+
+                            <a href="{{ $item['route'] ? route($item['route']) : '#' }}"
+                                class="group relative flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200
+                                        {{ $isActive 
+                                            ? 'bg-gold-500 text-navy-900 shadow-lg shadow-gold-500/20' 
+                                            : 'text-navy-300 hover:text-white hover:bg-navy-800' }}"
+                                :class="!sidebarOpen && 'justify-center'">
+                                    
+                                    {{-- Active Indicator Bar --}}
+                                    @if($isActive)
+                                        <div class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-navy-900 rounded-r-full -ml-3"></div>
+                                    @endif
+
+                                    <!-- Icon -->
+                                    <svg class="w-5 h-5 flex-shrink-0 {{ $isActive ? 'stroke-[2.5]' : '' }}" 
+                                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $item['icon'] }}"/>
+                                    </svg>
+
+                                    <!-- Label -->
+                                    <span x-show="sidebarOpen"
+                                        x-transition:enter="transition ease-out duration-200"
+                                        x-transition:enter-start="opacity-0 -translate-x-2"
+                                        x-transition:enter-end="opacity-100 translate-x-0"
+                                        class="text-sm font-medium whitespace-nowrap overflow-hidden">
+                                        {{ $item['label'] }}
+                                    </span>
+
+                                    {{-- Badge Low Stock --}}
                                     @if($item['route'] === 'warehouse.low-stocks.index' && $lowStockCount > 0)
-                                        <span class="ml-2 inline-flex items-center justify-center min-w-[18px] h-4 px-1 text-[10px] font-bold rounded-full bg-red-500 text-white">
+                                        <span x-show="sidebarOpen"
+                                            class="ml-auto inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 text-[10px] font-bold rounded-full bg-red-500 text-white">
                                             {{ $lowStockCount }}
                                         </span>
                                     @endif
-                                    <div class="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1 w-2 h-2 bg-navy-800 rotate-45 border-l border-b border-navy-700"></div>
-                                </div>
-                            </a>
+
+                                    <!-- Tooltip (saat collapsed) -->
+                                    <div x-show="!sidebarOpen"
+                                        class="absolute left-full ml-3 px-3 py-1.5 bg-navy-800 text-white text-xs font-medium rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap transition-opacity z-50 shadow-xl border border-navy-700">
+                                        {{ $item['label'] }}
+                                        @if($item['route'] === 'warehouse.low-stocks.index' && $lowStockCount > 0)
+                                            <span class="ml-2 inline-flex items-center justify-center min-w-[18px] h-4 px-1 text-[10px] font-bold rounded-full bg-red-500 text-white">
+                                                {{ $lowStockCount }}
+                                            </span>
+                                        @endif
+                                        <div class="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1 w-2 h-2 bg-navy-800 rotate-45 border-l border-b border-navy-700"></div>
+                                    </div>
+                                </a>
+                        @endif
                     @endforeach
                 </nav>
 

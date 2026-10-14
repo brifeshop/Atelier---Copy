@@ -38,6 +38,7 @@ use App\Http\Controllers\Production\CostingController;
 use App\Http\Controllers\Production\MaterialIssueController;
 use App\Http\Controllers\Production\WorkOrderProgressController;
 use App\Http\Controllers\Production\FinishedGoodsReceiptController;
+use App\Http\Controllers\Settings\UserController;
 
 use Illuminate\Support\Facades\Route;
 
@@ -283,5 +284,15 @@ Route::middleware(['auth', 'verified'])->prefix('production')->name('production.
     Route::get('costing/{cost_snapshot}', [CostingController::class, 'show'])->name('costing.show');
     Route::get('costing-export', [CostingController::class, 'export'])->name('costing.export');
 });
+
+// ==================== SETTINGS ====================
+Route::middleware(['auth', 'can:manage users'])
+    ->prefix('settings')
+    ->name('settings.')
+    ->group(function () {
+        Route::resource('users', UserController::class);
+        Route::patch('users/{user}/toggle-status', [UserController::class, 'toggleStatus'])
+            ->name('users.toggle-status');
+    });
 
 require __DIR__.'/auth.php';
