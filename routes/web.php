@@ -286,13 +286,42 @@ Route::middleware(['auth', 'verified'])->prefix('production')->name('production.
 });
 
 // ==================== SETTINGS ====================
-Route::middleware(['auth', 'can:manage users'])
+// Pastikan middleware-nya sesuai. Jika belum ada 'manage roles', 
+// kamu bisa pakai 'manage users' sementara, atau buat permission 'manage roles' di seeder.
+Route::middleware(['auth', 'can:manage roles']) 
     ->prefix('settings')
     ->name('settings.')
     ->group(function () {
         Route::resource('users', UserController::class);
         Route::patch('users/{user}/toggle-status', [UserController::class, 'toggleStatus'])
             ->name('users.toggle-status');
+
+        // ✅ Pindahkan route roles ke dalam group settings ini
+        Route::resource('roles', \App\Http\Controllers\Settings\RoleController::class);
+    });
+
+    // Group User & Role Management (Akses: manage roles)
+Route::middleware(['auth', 'can:manage roles']) 
+    ->prefix('settings')
+    ->name('settings.')
+    ->group(function () {
+        Route::resource('users', UserController::class);
+        Route::patch('users/{user}/toggle-status', [UserController::class, 'toggleStatus'])
+            ->name('users.toggle-status');
+        Route::resource('roles', \App\Http\Controllers\Settings\RoleController::class);
+    });
+
+// Group System Configuration & Audit (Akses: manage settings)
+Route::middleware(['auth', 'can:manage settings']) 
+    ->prefix('settings')
+    ->name('settings.')
+    ->group(function () {
+        Route::get('system/profile', [\App\Http\Controllers\Settings\SystemSettingsController::class, 'profile'])->name('system.profile');
+        Route::post('system/profile', [\App\Http\Controllers\Settings\SystemSettingsController::class, 'updateProfile'])->name('system.profile.update');
+        Route::get('system/preferences', [\App\Http\Controllers\Settings\SystemSettingsController::class, 'preferences'])->name('system.preferences');
+        Route::post('system/preferences', [\App\Http\Controllers\Settings\SystemSettingsController::class, 'updatePreferences'])->name('system.preferences.update');
+        
+        Route::get('audit/logs', [\App\Http\Controllers\Settings\AuditLogController::class, 'index'])->name('audit.logs');
     });
 
 require __DIR__.'/auth.php';

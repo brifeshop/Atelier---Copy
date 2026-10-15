@@ -29,3 +29,10 @@ Thumbs.db
 struktur.txt
 struktur-*.txt
 *.log
+# File sampah / artefak PowerShell
+*.csv
+*-summary.txt
+export-*.php
+*.bak
+RINGKASAN.md
+resume_project.md

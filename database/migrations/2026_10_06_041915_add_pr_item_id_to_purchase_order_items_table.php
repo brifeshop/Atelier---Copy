@@ -8,20 +8,24 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('purchase_order_items', function (Blueprint $table) {
-            $table->foreignId('purchase_requisition_item_id')
-                ->nullable()
-                ->after('purchase_order_id')
-                ->constrained('purchase_requisition_items')
-                ->nullOnDelete();
-        });
+        if (!Schema::hasColumn('purchase_order_items', 'purchase_requisition_item_id')) {
+            Schema::table('purchase_order_items', function (Blueprint $table) {
+                $table->foreignId('purchase_requisition_item_id')
+                    ->nullable()
+                    ->after('purchase_order_id')
+                    ->constrained('purchase_requisition_items')
+                    ->nullOnDelete();
+            });
+        }
     }
 
     public function down(): void
     {
-        Schema::table('purchase_order_items', function (Blueprint $table) {
-            $table->dropForeign(['purchase_requisition_item_id']);
-            $table->dropColumn('purchase_requisition_item_id');
-        });
+        if (Schema::hasColumn('purchase_order_items', 'purchase_requisition_item_id')) {
+            Schema::table('purchase_order_items', function (Blueprint $table) {
+                $table->dropForeign(['purchase_requisition_item_id']);
+                $table->dropColumn('purchase_requisition_item_id');
+            });
+        }
     }
 };

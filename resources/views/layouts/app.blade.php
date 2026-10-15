@@ -113,6 +113,7 @@
                             ['route' => 'warehouse.stock-opnames.index', 'label' => 'Stock Opname', 'icon' => 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4', 'group' => 'Warehouse'],
                             ['route' => 'warehouse.stock-cards.index', 'label' => 'Stock Card', 'icon' => 'M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2', 'group' => 'Warehouse'],
                             ['route' => 'warehouse.low-stocks.index', 'label' => 'Low Stock Alert', 'icon' => 'M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z', 'group' => 'Warehouse'],
+                            
                             // Produksi
                             ['route' => 'master.materials.index', 'label' => 'Material', 'icon' => 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4', 'group' => 'Produksi'],
                             ['route' => 'master.products.index', 'label' => 'Product', 'icon' => 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4', 'group' => 'Produksi'],
@@ -121,15 +122,9 @@
                             ['route' => 'production.work-orders.index', 'label' => 'Work Order', 'icon' => 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2', 'group' => 'Produksi'],
                             ['route' => 'production.costing.index', 'label' => 'HPP & Costing', 'icon' => 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z', 'group' => 'Produksi'],
                             ['route' => null, 'label' => 'Quality Control', 'icon' => 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z', 'group' => 'Produksi'],
-                            ['route' => 'master.materials.index', 'label' => 'Material', 'icon' => 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4', 'group' => 'Produksi'],
                             ['route' => 'master.materials.import', 'label' => 'Import Material', 'icon' => 'M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12', 'group' => 'Produksi'],
-                            ['route' => 'production.work-orders.index', 'label' => 'Work Order', 'icon' => '...', 'group' => 'Produksi'],
                             ['route' => 'production.material-issues.index', 'label' => 'Material Issue', 'icon' => 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01', 'group' => 'Produksi'],
-                            ['route' => 'production.costing.index', 'label' => 'HPP & Costing', 'icon' => '...', 'group' => 'Produksi'],
-                            ['route' => 'production.work-orders.index', 'label' => 'Work Order', 'icon' => '...', 'group' => 'Produksi'],
-                            ['route' => 'production.material-issues.index', 'label' => 'Material Issue', 'icon' => '...', 'group' => 'Produksi'],
                             ['route' => 'production.finished-goods.index', 'label' => 'FG Receipt', 'icon' => 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4', 'group' => 'Produksi'],
-                            ['route' => 'production.costing.index', 'label' => 'HPP & Costing', 'icon' => '...', 'group' => 'Produksi'],
 
                             // Pengiriman
                             ['route' => null, 'label' => 'Surat Jalan', 'icon' => 'M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0', 'group' => 'Pengiriman'],
@@ -143,7 +138,11 @@
                                 'group' => 'Lainnya',
                                 'submenu' => [
                                     ['route' => 'settings.users.index', 'label' => 'Users'],
-                                    ['route' => null, 'label' => 'Roles'],
+                                    ['route' => 'settings.roles.index', 'label' => 'Roles'],
+                                    // Menu System Settings & Audit Log menggunakan key 'permission' untuk kontrol akses
+                                    ['route' => 'settings.system.profile', 'label' => 'System Profile', 'permission' => 'manage settings'],
+                                    ['route' => 'settings.system.preferences', 'label' => 'Preferences', 'permission' => 'manage settings'],
+                                    ['route' => 'settings.audit.logs', 'label' => 'Audit Logs', 'permission' => 'manage settings'],
                                 ],
                             ],
                         ];
@@ -226,6 +225,17 @@
                                      x-transition:enter-end="opacity-100 translate-y-0"
                                      class="pl-8 pr-2 py-1 space-y-1">
                                     @foreach($item['submenu'] as $subItem)
+                                        
+                                        {{-- 🔒 KEAMANAN: Cek Permission sebelum render link --}}
+                                        @if(isset($subItem['permission']) && !auth()->user()->can($subItem['permission']))
+                                            @continue
+                                        @endif
+
+                                        {{-- 🔒 KEAMANAN: Khusus Role Owner hanya bisa diakses oleh Owner --}}
+                                        @if($subItem['label'] === 'Roles' && !auth()->user()->hasRole('Owner'))
+                                            @continue
+                                        @endif
+
                                         @php
                                             $isSubActive = $subItem['route'] && request()->routeIs($subItem['route'] . '*');
                                         @endphp
@@ -333,7 +343,6 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                                 </svg>
                                 <span x-show="sidebarOpen">Profile</span>
-                                
                             </a>
 
                             <form method="POST" action="{{ route('logout') }}">
