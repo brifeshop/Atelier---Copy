@@ -68,4 +68,8 @@ class SalesOrderItem extends Model
             $item->calculateTotals();
         });
     }
+    public function deliveryOrderItems()
+        {
+            return $this->hasMany(DeliveryOrderItem::class, 'sales_order_item_id');
+        }
 }

@@ -114,7 +114,8 @@
                         <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-end p-3 bg-navy-800/30 border border-navy-700 rounded-lg">
                             <div class="md:col-span-5">
                                 <label class="block text-xs font-semibold text-navy-300 uppercase tracking-wider mb-2">Lokasi</label>
-                                <select :name="`items[${idx}][location_id]`" x-model="loc.location_id" required
+                                {{-- Atribut required dihapus agar browser tidak error saat div disembunyikan --}}
+                                <select :name="`items[${idx}][location_id]`" x-model="loc.location_id" 
                                         class="w-full px-3 py-2 bg-navy-950 border border-navy-700 rounded text-sm text-white focus:border-gold-500 focus:outline-none">
                                     <option value="">-- Pilih Lokasi --</option>
                                     <template x-for="l in locations" :key="l.id">
@@ -124,7 +125,8 @@
                             </div>
                             <div class="md:col-span-3">
                                 <label class="block text-xs font-semibold text-navy-300 uppercase tracking-wider mb-2">Qty</label>
-                                <input type="number" :name="`items[${idx}][qty]`" x-model.number="loc.qty" step="0.01" min="0" required
+                                {{-- Atribut required dihapus --}}
+                                <input type="number" :name="`items[${idx}][qty]`" x-model.number="loc.qty" step="0.01" min="0" 
                                        class="w-full px-3 py-2 bg-navy-950 border border-navy-700 rounded text-sm text-white focus:border-gold-500 focus:outline-none">
                             </div>
                             <div class="md:col-span-3">
@@ -192,10 +194,8 @@
                 },
 
                 onWorkOrderChange() {
-                    // Optionally auto-fill qty_good
                     const wo = this.selectedWo;
                     if (wo && wo.planned) {
-                        // Auto-fill qty_good = planned (user bisa ubah)
                         const qtyInput = document.querySelector('input[name="qty_good"]');
                         if (qtyInput && !qtyInput.value) {
                             qtyInput.value = wo.actual > 0 ? wo.actual : wo.planned;
@@ -219,7 +219,14 @@
                         });
 
                         const data = await response.json();
-                        if (data.success) {
+                        // Perbaikan: Cek apakah response berupa array langsung, bukan object { success: true }
+                        if (Array.isArray(data)) {
+                            // Format data yang diterima dari Laravel
+                            this.locations = data.map(l => ({
+                                id: l.id,
+                                label: `${l.kode} — ${l.nama}`
+                            }));
+                        } else if (data.success && data.locations) {
                             this.locations = data.locations;
                         }
                     } catch (error) {

@@ -53,7 +53,8 @@
                     @endif
 
                     @if($item->canConfirm())
-                        <form method="POST" action="{{ route('sales.sales-orders.update-status', $item) }}" class="inline">
+                        {{-- PERBAIKAN: Pakai URL langsung --}}
+                        <form method="POST" action="{{ url('sales/sales-orders/' . $item->id . '/status') }}" class="inline">
                             @csrf
                             @method('PATCH')
                             <input type="hidden" name="status" value="confirmed">
@@ -64,7 +65,8 @@
                     @endif
 
                     @if(!in_array($item->status, ['draft', 'closed', 'cancelled']))
-                        <form method="POST" action="{{ route('sales.sales-orders.update-status', $item) }}" class="inline">
+                        {{-- PERBAIKAN: Pakai URL langsung --}}
+                        <form method="POST" action="{{ url('sales/sales-orders/' . $item->id . '/status') }}" class="inline">
                             @csrf
                             @method('PATCH')
                             <select name="status" onchange="this.form.submit()"
@@ -87,7 +89,8 @@
                     @endif
 
                     @if($item->canCancel())
-                        <form method="POST" action="{{ route('sales.sales-orders.update-status', $item) }}" class="inline"
+                        {{-- PERBAIKAN: Pakai URL langsung --}}
+                        <form method="POST" action="{{ url('sales/sales-orders/' . $item->id . '/status') }}" class="inline"
                               onsubmit="return confirm('Yakin batalkan SO ini?')">
                             @csrf
                             @method('PATCH')

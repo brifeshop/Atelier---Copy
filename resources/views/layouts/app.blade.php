@@ -87,6 +87,7 @@
 
                             // Sales
                             ['route' => 'sales.sales-orders.index', 'label' => 'Sales Order', 'icon' => 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z', 'group' => 'Sales'],
+                            ['route' => 'sales.delivery-orders.index', 'label' => 'Delivery Order', 'icon' => 'M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0', 'group' => 'Sales'],
                             ['route' => 'master.customers.index', 'label' => 'Customer', 'icon' => 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z', 'group' => 'Sales'],
 
                             // Purchasing
@@ -126,8 +127,7 @@
                             ['route' => 'production.material-issues.index', 'label' => 'Material Issue', 'icon' => 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01', 'group' => 'Produksi'],
                             ['route' => 'production.finished-goods.index', 'label' => 'FG Receipt', 'icon' => 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4', 'group' => 'Produksi'],
 
-                            // Pengiriman
-                            ['route' => null, 'label' => 'Surat Jalan', 'icon' => 'M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0', 'group' => 'Pengiriman'],
+                            // Pengiriman & Invoice (Untuk FASE berikutnya)
                             ['route' => null, 'label' => 'Invoice', 'icon' => 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z', 'group' => 'Pengiriman'],
 
                             // Lainnya
@@ -154,8 +154,8 @@
                         @if($item['group'] && ($loop->first || $menuItems[$loop->index - 1]['group'] !== $item['group']))
                             <div x-show="sidebarOpen" 
                                  x-transition:enter="transition ease-out duration-200"
-                                 x-transition:enter-start="opacity-0"
-                                 x-transition:enter-end="opacity-100"
+                                 x-transition:enter-start="opacity-0 -translate-x-2"
+                                 x-transition:enter-end="opacity-100 translate-x-0"
                                  class="pt-4 pb-2 px-3">
                                  <p class="text-[10px] font-semibold text-navy-500 uppercase tracking-widest">{{ $item['group'] }}</p>
                             </div>

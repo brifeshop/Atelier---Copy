@@ -95,8 +95,17 @@ class InventoryController extends Controller
      */
     public function show(Inventory $inventory)
     {
-        $inventory->load(['location.warehouse', 'item']);
-        return view('warehouse.inventories.show', ['item' => $inventory]);
+        $inventory->load(['item', 'location.warehouse']);
+
+        $movements = \App\Models\Warehouse\StockMovement::where('item_type', $inventory->item_type)
+            ->where('item_id', $inventory->item_id)
+            ->where('location_id', $inventory->location_id)
+            ->with(['createdBy']) // <--- Ubah jadi createdBy
+            ->orderByDesc('date')
+            ->orderByDesc('id')
+            ->paginate(15);
+
+        return view('warehouse.inventories.show', compact('inventory', 'movements'));
     }
 
     /**
