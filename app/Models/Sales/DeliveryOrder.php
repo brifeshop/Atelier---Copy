@@ -148,4 +148,9 @@ class DeliveryOrder extends Model
     {
         return (float) $this->items->sum('qty_shipped');
     }
+    
+        public function invoices(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(SalesInvoice::class, 'delivery_order_id');
+    }
 }

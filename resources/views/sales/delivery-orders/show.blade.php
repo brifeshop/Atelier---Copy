@@ -41,7 +41,7 @@
             </div>
 
             <div class="flex flex-wrap gap-2">
-                {{-- Mark Ready --}}
+                {{-- Tombol Aksi DO (Mark Ready, Ship, Deliver) --}}
                 @if($deliveryOrder->status === 'draft')
                     <form method="POST" action="{{ route('sales.delivery-orders.mark-ready', $deliveryOrder) }}">
                         @csrf
@@ -52,7 +52,6 @@
                     </form>
                 @endif
 
-                {{-- Ship --}}
                 @if($deliveryOrder->status === 'ready')
                     <form method="POST" action="{{ route('sales.delivery-orders.ship', $deliveryOrder) }}" onsubmit="return confirm('Kirim DO ini? Stok produk akan dikurangi.')">
                         @csrf
@@ -63,7 +62,6 @@
                     </form>
                 @endif
 
-                {{-- Deliver --}}
                 @if($deliveryOrder->status === 'shipped')
                     <form method="POST" action="{{ route('sales.delivery-orders.deliver', $deliveryOrder) }}" onsubmit="return confirm('Tandai DO ini sudah diterima customer?')">
                         @csrf
@@ -74,7 +72,6 @@
                     </form>
                 @endif
 
-                {{-- Cancel --}}
                 @if($deliveryOrder->canBeCancelled())
                     <form method="POST" action="{{ route('sales.delivery-orders.cancel', $deliveryOrder) }}" onsubmit="return confirm('Batalkan DO ini?')">
                         @csrf
@@ -83,6 +80,24 @@
                             Batalkan DO
                         </x-atelier.button>
                     </form>
+                @endif
+
+                {{-- ========================================== --}}
+                {{-- TOMBOL GENERATE INVOICE (BARU DITAMBAHKAN) --}}
+                {{-- ========================================== --}}
+                @if(in_array($deliveryOrder->status, ['shipped', 'delivered']))
+                    @if($deliveryOrder->invoices->count() == 0)
+                        <form method="POST" action="{{ route('sales.delivery-orders.generate-invoice', $deliveryOrder) }}">
+                            @csrf
+                            <x-atelier.button type="submit" variant="secondary" size="sm" class="border-gold-500 text-gold-500 hover:bg-gold-500 hover:text-navy-900">
+                                Buat Invoice
+                            </x-atelier.button>
+                        </form>
+                    @else
+                        <x-atelier.button :href="route('sales.invoices.show', $deliveryOrder->invoices->first())" variant="primary" size="sm">
+                            Lihat Invoice
+                        </x-atelier.button>
+                    @endif
                 @endif
             </div>
         </div>

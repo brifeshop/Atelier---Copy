@@ -13,6 +13,7 @@ use App\Http\Controllers\Master\MaterialImportController;
 
 use App\Http\Controllers\Sales\SalesOrderController;
 use App\Http\Controllers\Sales\DeliveryOrderController;
+use App\Http\Controllers\Sales\SalesInvoiceController;
 
 use App\Http\Controllers\Warehouse\WarehouseController;
 use App\Http\Controllers\Warehouse\LocationController;
@@ -158,6 +159,18 @@ Route::middleware(['auth', 'verified'])->prefix('sales')->name('sales.')->group(
             ->middleware('can:edit delivery-orders')
             ->name('cancel');
     });
+        // ---------- SALES INVOICE ----------
+    Route::prefix('invoices')->name('invoices.')->group(function () {
+        Route::get('/', [SalesInvoiceController::class, 'index'])->name('index');
+        Route::get('/{invoice}', [SalesInvoiceController::class, 'show'])->name('show');
+        Route::get('/{invoice}/print', [SalesInvoiceController::class, 'print'])->name('print');
+        Route::patch('/{invoice}/mark-paid', [SalesInvoiceController::class, 'markPaid'])->name('mark-paid');
+        Route::patch('/{invoice}/cancel', [SalesInvoiceController::class, 'cancel'])->name('cancel');
+    });
+
+    // Route untuk membuat Invoice dari DO
+    Route::post('delivery-orders/{deliveryOrder}/invoice', [SalesInvoiceController::class, 'store'])
+        ->name('delivery-orders.generate-invoice');
 });
 
 // ==================== WAREHOUSE ====================
