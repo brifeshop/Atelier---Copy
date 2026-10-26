@@ -153,4 +153,8 @@ class DeliveryOrder extends Model
     {
         return $this->hasMany(SalesInvoice::class, 'delivery_order_id');
     }
+        public function returns(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(SalesReturn::class, 'delivery_order_id');
+    }
 }

@@ -14,6 +14,7 @@ use App\Http\Controllers\Master\MaterialImportController;
 use App\Http\Controllers\Sales\SalesOrderController;
 use App\Http\Controllers\Sales\DeliveryOrderController;
 use App\Http\Controllers\Sales\SalesInvoiceController;
+use App\Http\Controllers\Sales\SalesReturnController;
 
 use App\Http\Controllers\Warehouse\WarehouseController;
 use App\Http\Controllers\Warehouse\LocationController;
@@ -97,6 +98,19 @@ Route::middleware(['auth', 'verified'])->prefix('sales')->name('sales.')->group(
     Route::resource('sales-orders', SalesOrderController::class);
     Route::patch('sales-orders/{sales_order}/status', [SalesOrderController::class, 'updateStatus'])
         ->name('sales-orders.status');
+
+        // ---------- SALES RETURN ----------
+    Route::prefix('returns')->name('returns.')->group(function () {
+        Route::get('/', [SalesReturnController::class, 'index'])->name('index');
+        Route::get('/create', [SalesReturnController::class, 'create'])->name('create');
+        Route::post('/', [SalesReturnController::class, 'store'])->name('store');
+        Route::get('/{return}', [SalesReturnController::class, 'show'])->name('show');
+        Route::patch('/{return}/complete', [SalesReturnController::class, 'complete'])->name('complete');
+        Route::patch('/{return}/cancel', [SalesReturnController::class, 'cancel'])->name('cancel');
+        
+        // API untuk ambil item DO
+        Route::get('/delivery-order/{deliveryOrder}', [SalesReturnController::class, 'getDeliveryOrderDetails'])->name('do-details');
+    });
 
     // ---------- DELIVERY ORDER ----------
     Route::prefix('delivery-orders')->name('delivery-orders.')->group(function () {
