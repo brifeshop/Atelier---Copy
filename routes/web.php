@@ -329,3 +329,4 @@ Route::middleware(['auth', 'can:manage settings'])
     });
 
 require __DIR__.'/auth.php';
+require __DIR__.'/finance.php';

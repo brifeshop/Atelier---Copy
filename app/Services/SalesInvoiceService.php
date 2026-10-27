@@ -87,13 +87,22 @@ class SalesInvoiceService
                 ]);
             }
 
-            // 3. Update total di header Invoice
+                        // 3. Update total di header Invoice
             $invoice->update([
                 'subtotal'     => $subtotal,
                 'total_amount' => $subtotal,
             ]);
 
             DB::commit();
+
+            // Auto-create AR + jurnal penjualan
+            // Dibungkus try-catch agar kegagalan AR tidak menggagalkan invoice
+            // (invoice sudah commit; AR bisa di-generate ulang manual jika gagal)
+            try {
+                \App\Services\Finance\ArService::createFromSalesInvoice($invoice);
+            } catch (\Exception $e) {
+                \Log::error('Gagal auto-create AR untuk invoice ' . $invoice->invoice_number . ': ' . $e->getMessage());
+            }
 
             return $invoice->fresh(['items', 'customer', 'deliveryOrder']);
         } catch (\Exception $e) {

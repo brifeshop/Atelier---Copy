@@ -200,7 +200,7 @@ class GoodsReceiptController extends Controller
      * - Panggil StockMovementService::recordIn() untuk setiap item
      * - Update status PO (partial / received)
      */
-    public function receive(GoodsReceipt $goodsReceipt)
+        public function receive(GoodsReceipt $goodsReceipt)
     {
         if (!$goodsReceipt->canReceive()) {
             return back()->with('error', 'GR tidak bisa dikonfirmasi.');
@@ -240,6 +240,17 @@ class GoodsReceiptController extends Controller
                 'status' => 'received',
                 'received_at' => now(),
             ]);
+
+            // ========================================================
+            // TAMBAHAN BARU: AUTO-CREATE AP (HUTANG) DARI GR INI
+            // ========================================================
+            try {
+                \App\Services\Finance\ApService::createFromGoodsReceipt($goodsReceipt);
+            } catch (\Exception $e) {
+                \Log::error('Gagal auto-create AP untuk GR ' . $goodsReceipt->gr_number . ': ' . $e->getMessage());
+            }
+            // ========================================================
+
             // Kirim notifikasi ke Purchasing kalau ada reject
             $rejects = $goodsReceipt->items->filter(fn($i) => $i->qty_rejected > 0);
 
@@ -276,7 +287,7 @@ class GoodsReceiptController extends Controller
 
             return redirect()
                 ->route('purchasing.goods-receipts.show', $goodsReceipt)
-                ->with('success', "GR {$goodsReceipt->gr_number} berhasil dikonfirmasi. Stok sudah bertambah.");
+                ->with('success', "GR {$goodsReceipt->gr_number} berhasil dikonfirmasi. Stok sudah bertambah & Hutang (AP) tercatat.");
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->with('error', 'Gagal konfirmasi GR: ' . $e->getMessage());

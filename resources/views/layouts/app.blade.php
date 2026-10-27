@@ -18,12 +18,20 @@
 
         <style>
             [x-cloak] { display: none !important; }
+
+            /* Custom Scrollbar - Atelier Theme */
+            ::-webkit-scrollbar { width: 6px; height: 6px; }
+            ::-webkit-scrollbar-track { background: transparent; }
+            ::-webkit-scrollbar-thumb { background: #2A3A5A; border-radius: 10px; }
+            ::-webkit-scrollbar-thumb:hover { background: #C9A961; }
+            * { scrollbar-width: thin; scrollbar-color: #2A3A5A transparent; }
         </style>
     </head>
     <body class="font-sans antialiased bg-navy-950 text-navy-100">
         
-        <div class="min-h-screen flex" x-data="{ 
+        <div class="h-screen flex overflow-hidden" x-data="{ 
             sidebarOpen: JSON.parse(localStorage.getItem('sidebarOpen') ?? 'true'),
+            searchMenu: '',
             toggleSidebar() {
                 this.sidebarOpen = !this.sidebarOpen;
                 localStorage.setItem('sidebarOpen', this.sidebarOpen);
@@ -35,14 +43,13 @@
             <!-- ============================================ -->
             <aside 
                 :class="sidebarOpen ? 'w-64' : 'w-20'"
-                class="bg-navy-950 border-r border-navy-800 flex flex-col flex-shrink-0 transition-all duration-300 ease-in-out"
+                class="bg-navy-950 border-r border-navy-800 flex flex-col flex-shrink-0 transition-all duration-300 ease-in-out h-full"
             >
                 
                 <!-- LOGO + TOGGLE -->
-                <div class="h-20 flex items-center border-b border-navy-800 px-4"
+                <div class="h-20 flex items-center border-b border-navy-800 px-4 flex-shrink-0"
                      :class="sidebarOpen ? 'justify-between' : 'justify-center'">
                     
-                    <!-- Logo -->
                     <div class="flex items-center gap-3 overflow-hidden">
                         <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-gold-500 to-gold-600 flex items-center justify-center shadow-lg shadow-gold-500/20 flex-shrink-0">
                             <span class="font-serif text-xl font-bold text-navy-900">A</span>
@@ -57,7 +64,6 @@
                         </div>
                     </div>
 
-                    <!-- Toggle Button -->
                     <button @click="toggleSidebar()" 
                             x-show="sidebarOpen"
                             class="text-navy-500 hover:text-gold-500 transition flex-shrink-0">
@@ -67,253 +73,281 @@
                     </button>
                 </div>
 
-                <!-- EXPAND BUTTON (saat collapsed) -->
                 <button @click="toggleSidebar()" 
                         x-show="!sidebarOpen"
-                        class="mx-auto mt-4 w-10 h-10 rounded-lg text-navy-500 hover:text-gold-500 hover:bg-navy-800 transition flex items-center justify-center">
+                        class="mx-auto mt-4 w-10 h-10 rounded-lg text-navy-500 hover:text-gold-500 hover:bg-navy-800 transition flex items-center justify-center flex-shrink-0">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"/>
                     </svg>
                 </button>
 
                 <!-- NAVIGATION -->
-                <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-1">
+                <div class="flex-1 flex flex-col overflow-hidden">
+                    
+                    <!-- SEARCH MENU -->
+                    <div class="px-3 pt-4 pb-2 flex-shrink-0" x-show="sidebarOpen" x-transition>
+                        <div class="relative">
+                            <input type="text" 
+                                   x-model="searchMenu" 
+                                   placeholder="Cari menu..." 
+                                   class="w-full bg-navy-900 border border-navy-700 text-navy-200 text-sm rounded-lg pl-9 pr-3 py-2 focus:border-gold-500 focus:ring-1 focus:ring-gold-500 focus:outline-none placeholder-navy-500 transition-all">
+                            <svg class="w-4 h-4 text-navy-500 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                            </svg>
+                        </div>
+                    </div>
 
-                    @php
-                        $lowStockCount = \App\Models\Warehouse\Inventory::lowStock()->whereNotNull('min_stock')->count();
-                        $menuItems = [
-                            // Dashboard
-                            ['route' => 'dashboard', 'label' => 'Dashboard', 'icon' => 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6', 'group' => null],
+                    <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-1">
 
-                            // Sales
-                            ['route' => 'sales.sales-orders.index', 'label' => 'Sales Order', 'icon' => 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z', 'group' => 'Sales'],
-                            ['route' => 'sales.delivery-orders.index', 'label' => 'Delivery Order', 'icon' => 'M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0', 'group' => 'Sales'],
-                            ['route' => 'sales.invoices.index', 'label' => 'Invoice', 'icon' => 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z', 'group' => 'Sales'],
-                            ['route' => 'sales.returns.index', 'label' => 'Sales Return', 'icon' => 'M3 10h10a1 1 0 011 1v10M3 10l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V10z', 'group' => 'Sales'],
-                            ['route' => 'master.customers.index', 'label' => 'Customer', 'icon' => 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z', 'group' => 'Sales'],
+                        @php
+                            $lowStockCount = \App\Models\Warehouse\Inventory::lowStock()->whereNotNull('min_stock')->count();
+                            $menuItems = [
+                                // Dashboard
+                                ['route' => 'dashboard', 'label' => 'Dashboard', 'icon' => 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6', 'group' => null],
 
-                            // Purchasing
-                            ['route' => 'purchasing.dashboard', 'label' => 'Dashboard', 'icon' => 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6', 'group' => 'Purchasing'],
-                            ['route' => 'purchasing.purchase-requisitions.index', 'label' => 'Purchase Requisition', 'icon' => 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z', 'group' => 'Purchasing'],
-                            ['route' => 'purchasing.purchase-orders.index', 'label' => 'Purchase Order', 'icon' => 'M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z', 'group' => 'Purchasing'],
-                            ['route' => 'purchasing.goods-receipts.index', 'label' => 'Goods Receipt', 'icon' => 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4', 'group' => 'Purchasing'],
-                            ['route' => 'master.suppliers.index', 'label' => 'Supplier', 'icon' => 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4', 'group' => 'Purchasing'],
-                            ['route' => 'purchasing.supplier-prices.index', 'label' => 'Supplier Price', 'icon' => 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z', 'group' => 'Purchasing'],
-                            ['route' => 'purchasing.purchase-returns.index', 'label' => 'Purchase Return', 'icon' => 'M3 10h10a1 1 0 011 1v10M3 10l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V10z', 'group' => 'Purchasing'],
-                            ['route' => 'purchasing.supplier-evaluations.index', 'label' => 'Supplier Evaluation', 'icon' => 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z', 'group' => 'Purchasing'],
+                                // Sales
+                                ['route' => 'sales.sales-orders.index', 'label' => 'Sales Order', 'icon' => 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z', 'group' => 'Sales'],
+                                ['route' => 'sales.delivery-orders.index', 'label' => 'Delivery Order', 'icon' => 'M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0', 'group' => 'Sales'],
+                                ['route' => 'sales.invoices.index', 'label' => 'Invoice', 'icon' => 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z', 'group' => 'Sales'],
+                                ['route' => 'sales.returns.index', 'label' => 'Sales Return', 'icon' => 'M3 10h10a1 1 0 011 1v10M3 10l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V10z', 'group' => 'Sales'],
+                                ['route' => 'master.customers.index', 'label' => 'Customer', 'icon' => 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z', 'group' => 'Sales'],
 
-                            // HR
-                            ['route' => 'master.employees.index', 'label' => 'Employee', 'icon' => 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z', 'group' => 'HR'],
-                            ['route' => 'master.machines.index', 'label' => 'Machine', 'icon' => 'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z', 'group' => 'HR'],
-                            ['route' => 'master.work-centers.index', 'label' => 'Work Center', 'icon' => 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4', 'group' => 'HR'],
+                                // Purchasing
+                                ['route' => 'purchasing.dashboard', 'label' => 'Dashboard', 'icon' => 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6', 'group' => 'Purchasing'],
+                                ['route' => 'purchasing.purchase-requisitions.index', 'label' => 'Purchase Requisition', 'icon' => 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z', 'group' => 'Purchasing'],
+                                ['route' => 'purchasing.purchase-orders.index', 'label' => 'Purchase Order', 'icon' => 'M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z', 'group' => 'Purchasing'],
+                                ['route' => 'purchasing.goods-receipts.index', 'label' => 'Goods Receipt', 'icon' => 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4', 'group' => 'Purchasing'],
+                                ['route' => 'master.suppliers.index', 'label' => 'Supplier', 'icon' => 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4', 'group' => 'Purchasing'],
+                                ['route' => 'purchasing.supplier-prices.index', 'label' => 'Supplier Price', 'icon' => 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z', 'group' => 'Purchasing'],
+                                ['route' => 'purchasing.purchase-returns.index', 'label' => 'Purchase Return', 'icon' => 'M3 10h10a1 1 0 011 1v10M3 10l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V10z', 'group' => 'Purchasing'],
+                                ['route' => 'purchasing.supplier-evaluations.index', 'label' => 'Supplier Evaluation', 'icon' => 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z', 'group' => 'Purchasing'],
 
-                            // Warehouse
-                            ['route' => 'warehouse.warehouses.index', 'label' => 'Warehouse', 'icon' => 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4', 'group' => 'Warehouse'],
-                            ['route' => 'warehouse.locations.index', 'label' => 'Location', 'icon' => 'M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z M15 11a3 3 0 11-6 0 3 3 0 016 0z', 'group' => 'Warehouse'],
-                            ['route' => 'warehouse.inventories.index', 'label' => 'Inventory', 'icon' => 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4', 'group' => 'Warehouse'],
-                            ['route' => 'warehouse.stock-movements.index', 'label' => 'Stock Movement', 'icon' => 'M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4', 'group' => 'Warehouse'],
-                            ['route' => 'warehouse.stock-movements.adjustments', 'label' => 'Stock Adjustment', 'icon' => 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z', 'group' => 'Warehouse'],
-                            ['route' => 'warehouse.stock-opnames.index', 'label' => 'Stock Opname', 'icon' => 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4', 'group' => 'Warehouse'],
-                            ['route' => 'warehouse.stock-cards.index', 'label' => 'Stock Card', 'icon' => 'M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2', 'group' => 'Warehouse'],
-                            ['route' => 'warehouse.low-stocks.index', 'label' => 'Low Stock Alert', 'icon' => 'M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z', 'group' => 'Warehouse'],
-                            
-                            // Produksi
-                            ['route' => 'master.materials.index', 'label' => 'Material', 'icon' => 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4', 'group' => 'Produksi'],
-                            ['route' => 'master.products.index', 'label' => 'Product', 'icon' => 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4', 'group' => 'Produksi'],
-                            ['route' => 'engineering.boms.index', 'label' => 'Bill of Materials', 'icon' => 'M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10', 'group' => 'Produksi'],
-                            ['route' => 'engineering.routings.index', 'label' => 'Routing', 'icon' => 'M13 10V3L4 14h7v7l9-11h-7z', 'group' => 'Produksi'],
-                            ['route' => 'production.work-orders.index', 'label' => 'Work Order', 'icon' => 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2', 'group' => 'Produksi'],
-                            ['route' => 'production.costing.index', 'label' => 'HPP & Costing', 'icon' => 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z', 'group' => 'Produksi'],
-                            ['route' => null, 'label' => 'Quality Control', 'icon' => 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z', 'group' => 'Produksi'],
-                            ['route' => 'master.materials.import', 'label' => 'Import Material', 'icon' => 'M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12', 'group' => 'Produksi'],
-                            ['route' => 'production.material-issues.index', 'label' => 'Material Issue', 'icon' => 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01', 'group' => 'Produksi'],
-                            ['route' => 'production.finished-goods.index', 'label' => 'FG Receipt', 'icon' => 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4', 'group' => 'Produksi'],
+                                // Finance
+                                ['route' => 'finance.dashboard', 'label' => 'Finance Dashboard', 'icon' => 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6', 'group' => 'Finance'],
+                                ['route' => 'finance.ar.index', 'label' => 'Piutang (AR)', 'icon' => 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z', 'group' => 'Finance'],
+                                ['route' => 'finance.payments.index', 'label' => 'Pembayaran', 'icon' => 'M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z', 'group' => 'Finance'],
+                                ['route' => 'finance.ap.index', 'label' => 'Hutang (AP)', 'icon' => 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4', 'group' => 'Finance'],
 
+                                // HR
+                                ['route' => 'master.employees.index', 'label' => 'Employee', 'icon' => 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z', 'group' => 'HR'],
+                                ['route' => 'master.machines.index', 'label' => 'Machine', 'icon' => 'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z', 'group' => 'HR'],
+                                ['route' => 'master.work-centers.index', 'label' => 'Work Center', 'icon' => 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4', 'group' => 'HR'],
 
+                                // Warehouse
+                                ['route' => 'warehouse.warehouses.index', 'label' => 'Warehouse', 'icon' => 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4', 'group' => 'Warehouse'],
+                                ['route' => 'warehouse.locations.index', 'label' => 'Location', 'icon' => 'M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z M15 11a3 3 0 11-6 0 3 3 0 016 0z', 'group' => 'Warehouse'],
+                                ['route' => 'warehouse.inventories.index', 'label' => 'Inventory', 'icon' => 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4', 'group' => 'Warehouse'],
+                                ['route' => 'warehouse.stock-movements.index', 'label' => 'Stock Movement', 'icon' => 'M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4', 'group' => 'Warehouse'],
+                                ['route' => 'warehouse.stock-movements.adjustments', 'label' => 'Stock Adjustment', 'icon' => 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z', 'group' => 'Warehouse'],
+                                ['route' => 'warehouse.stock-opnames.index', 'label' => 'Stock Opname', 'icon' => 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4', 'group' => 'Warehouse'],
+                                ['route' => 'warehouse.stock-cards.index', 'label' => 'Stock Card', 'icon' => 'M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2', 'group' => 'Warehouse'],
+                                ['route' => 'warehouse.low-stocks.index', 'label' => 'Low Stock Alert', 'icon' => 'M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z', 'group' => 'Warehouse'],
+                                
+                                // Produksi
+                                ['route' => 'master.materials.index', 'label' => 'Material', 'icon' => 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4', 'group' => 'Produksi'],
+                                ['route' => 'master.products.index', 'label' => 'Product', 'icon' => 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4', 'group' => 'Produksi'],
+                                ['route' => 'engineering.boms.index', 'label' => 'Bill of Materials', 'icon' => 'M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10', 'group' => 'Produksi'],
+                                ['route' => 'engineering.routings.index', 'label' => 'Routing', 'icon' => 'M13 10V3L4 14h7v7l9-11h-7z', 'group' => 'Produksi'],
+                                ['route' => 'production.work-orders.index', 'label' => 'Work Order', 'icon' => 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2', 'group' => 'Produksi'],
+                                ['route' => 'production.costing.index', 'label' => 'HPP & Costing', 'icon' => 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z', 'group' => 'Produksi'],
+                                ['route' => null, 'label' => 'Quality Control', 'icon' => 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z', 'group' => 'Produksi'],
+                                ['route' => 'master.materials.import', 'label' => 'Import Material', 'icon' => 'M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12', 'group' => 'Produksi'],
+                                ['route' => 'production.material-issues.index', 'label' => 'Material Issue', 'icon' => 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01', 'group' => 'Produksi'],
+                                ['route' => 'production.finished-goods.index', 'label' => 'FG Receipt', 'icon' => 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4', 'group' => 'Produksi'],
 
-                            // Lainnya
-                            ['route' => null, 'label' => 'Laporan', 'icon' => 'M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z', 'group' => 'Lainnya'],
-                            [
-                                'label' => 'Pengaturan',
-                                'icon' => 'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z',
-                                'group' => 'Lainnya',
-                                'submenu' => [
-                                    ['route' => 'settings.users.index', 'label' => 'Users'],
-                                    ['route' => 'settings.roles.index', 'label' => 'Roles'],
-                                    // Menu System Settings & Audit Log menggunakan key 'permission' untuk kontrol akses
-                                    ['route' => 'settings.system.profile', 'label' => 'System Profile', 'permission' => 'manage settings'],
-                                    ['route' => 'settings.system.preferences', 'label' => 'Preferences', 'permission' => 'manage settings'],
-                                    ['route' => 'settings.audit.logs', 'label' => 'Audit Logs', 'permission' => 'manage settings'],
+                                // Lainnya
+                                ['route' => null, 'label' => 'Laporan', 'icon' => 'M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z', 'group' => 'Lainnya'],
+                                [
+                                    'label' => 'Pengaturan',
+                                    'icon' => 'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z',
+                                    'group' => 'Lainnya',
+                                    'submenu' => [
+                                        ['route' => 'settings.users.index', 'label' => 'Users'],
+                                        ['route' => 'settings.roles.index', 'label' => 'Roles'],
+                                        ['route' => 'settings.system.profile', 'label' => 'System Profile', 'permission' => 'manage settings'],
+                                        ['route' => 'settings.system.preferences', 'label' => 'Preferences', 'permission' => 'manage settings'],
+                                        ['route' => 'settings.audit.logs', 'label' => 'Audit Logs', 'permission' => 'manage settings'],
+                                    ],
                                 ],
-                            ],
-                        ];
-                    @endphp
+                            ];
+                        @endphp
 
-                    @foreach($menuItems as $item)
-                        
-                        {{-- Group Label --}}
-                        @if($item['group'] && ($loop->first || $menuItems[$loop->index - 1]['group'] !== $item['group']))
-                            <div x-show="sidebarOpen" 
-                                 x-transition:enter="transition ease-out duration-200"
-                                 x-transition:enter-start="opacity-0 -translate-x-2"
-                                 x-transition:enter-end="opacity-100 translate-x-0"
-                                 class="pt-4 pb-2 px-3">
-                                 <p class="text-[10px] font-semibold text-navy-500 uppercase tracking-widest">{{ $item['group'] }}</p>
-                            </div>
-                            <div x-show="!sidebarOpen" class="pt-3"></div>
-                        @endif
-
-                        @if(isset($item['submenu']))
-                            {{-- Dropdown Menu --}}
+                        @foreach($menuItems as $item)
                             @php
-                                $hasSubActive = false;
-                                foreach ($item['submenu'] as $sub) {
-                                    if ($sub['route'] && request()->routeIs($sub['route'] . '*')) {
-                                        $hasSubActive = true;
-                                        break;
+                                $label = strtolower($item['label']);
+                                $group = isset($item['group']) && $item['group'] ? strtolower($item['group']) : '';
+                                
+                                // Siapkan daftar string submenu untuk pengecekan pencarian di Alpine.js
+                                $submenuLabels = [];
+                                if (isset($item['submenu'])) {
+                                    foreach ($item['submenu'] as $sub) {
+                                        $submenuLabels[] = strtolower($sub['label']);
                                     }
                                 }
+                                $submenuString = implode('|', $submenuLabels);
                             @endphp
 
-                            <div x-data="{ open: {{ $hasSubActive ? 'true' : 'false' }} }" class="relative">
-                                <button @click="open = !open" 
-                                    type="button"
-                                    class="w-full group relative flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200
-                                            {{ $hasSubActive 
-                                                ? 'bg-navy-800 text-gold-400 font-semibold' 
-                                                : 'text-navy-300 hover:text-white hover:bg-navy-800' }}"
-                                    :class="!sidebarOpen && 'justify-center'">
-                                    
-                                    @if($hasSubActive)
-                                        <div class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-gold-500 rounded-r-full -ml-3"></div>
-                                    @endif
-
-                                    <!-- Icon -->
-                                    <svg class="w-5 h-5 flex-shrink-0 {{ $hasSubActive ? 'text-gold-500' : '' }}" 
-                                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $item['icon'] }}"/>
-                                    </svg>
-
-                                    <!-- Label -->
-                                    <span x-show="sidebarOpen"
-                                        x-transition:enter="transition ease-out duration-200"
-                                        x-transition:enter-start="opacity-0 -translate-x-2"
-                                        x-transition:enter-end="opacity-100 translate-x-0"
-                                        class="text-sm font-medium whitespace-nowrap overflow-hidden flex-1 text-left">
-                                        {{ $item['label'] }}
-                                    </span>
-
-                                    <!-- Chevron -->
-                                    <svg x-show="sidebarOpen" 
-                                        class="w-4 h-4 text-navy-400 transition-transform duration-200 flex-shrink-0"
-                                        :class="open ? 'rotate-180 text-gold-500' : ''"
-                                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                                    </svg>
-
-                                    <!-- Tooltip (saat collapsed) -->
-                                    <div x-show="!sidebarOpen"
-                                        class="absolute left-full ml-3 px-3 py-1.5 bg-navy-800 text-white text-xs font-medium rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap transition-opacity z-50 shadow-xl border border-navy-700">
-                                        {{ $item['label'] }}
-                                        <div class="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1 w-2 h-2 bg-navy-800 rotate-45 border-l border-b border-navy-700"></div>
+                            <div x-show="searchMenu === '' || 
+                                         '{{ $label }}'.includes(searchMenu.toLowerCase()) || 
+                                         '{{ $group }}'.includes(searchMenu.toLowerCase()) || 
+                                         '{{ $submenuString }}'.toLowerCase().includes(searchMenu.toLowerCase())"
+                                 class="space-y-1">
+                                
+                                {{-- Group Label --}}
+                                @if($item['group'] && ($loop->first || $menuItems[$loop->index - 1]['group'] !== $item['group']))
+                                    <div x-show="sidebarOpen" 
+                                         x-transition:enter="transition ease-out duration-200"
+                                         x-transition:enter-start="opacity-0 -translate-x-2"
+                                         x-transition:enter-end="opacity-100 translate-x-0"
+                                         class="pt-4 pb-2 px-3">
+                                         <p class="text-[10px] font-semibold text-navy-500 uppercase tracking-widest">{{ $item['group'] }}</p>
                                     </div>
-                                </button>
+                                    <div x-show="!sidebarOpen" class="pt-3"></div>
+                                @endif
 
-                                <!-- Submenu Links -->
-                                <div x-show="open && sidebarOpen" 
-                                     x-transition:enter="transition ease-out duration-150"
-                                     x-transition:enter-start="opacity-0 -translate-y-1"
-                                     x-transition:enter-end="opacity-100 translate-y-0"
-                                     class="pl-8 pr-2 py-1 space-y-1">
-                                    @foreach($item['submenu'] as $subItem)
-                                        
-                                        {{-- 🔒 KEAMANAN: Cek Permission sebelum render link --}}
-                                        @if(isset($subItem['permission']) && !auth()->user()->can($subItem['permission']))
-                                            @continue
-                                        @endif
+                                @if(isset($item['submenu']))
+                                    {{-- Dropdown Menu --}}
+                                    @php
+                                        $hasSubActive = false;
+                                        foreach ($item['submenu'] as $sub) {
+                                            if ($sub['route'] && request()->routeIs($sub['route'] . '*')) {
+                                                $hasSubActive = true;
+                                                break;
+                                            }
+                                        }
+                                    @endphp
 
-                                        {{-- 🔒 KEAMANAN: Khusus Role Owner hanya bisa diakses oleh Owner --}}
-                                        @if($subItem['label'] === 'Roles' && !auth()->user()->hasRole('Owner'))
-                                            @continue
-                                        @endif
-
-                                        @php
-                                            $isSubActive = $subItem['route'] && request()->routeIs($subItem['route'] . '*');
-                                        @endphp
-                                        <a href="{{ $subItem['route'] ? route($subItem['route']) : '#' }}"
-                                           class="flex items-center justify-between px-3 py-1.5 rounded-lg text-xs font-medium transition
-                                                  {{ $isSubActive 
-                                                      ? 'bg-gold-500 text-navy-900 font-bold shadow-sm' 
-                                                      : ($subItem['route'] ? 'text-navy-300 hover:text-white hover:bg-navy-800/60' : 'text-navy-500 cursor-not-allowed') }}">
-                                            <span>{{ $subItem['label'] }}</span>
-                                            @if(!$subItem['route'])
-                                                <span class="text-[9px] uppercase tracking-wider px-1 py-0.5 rounded bg-navy-800 text-navy-500 border border-navy-700">Nanti</span>
+                                    <div x-data="{ open: {{ $hasSubActive ? 'true' : 'false' }} }" class="relative">
+                                        <button @click="open = !open" 
+                                            type="button"
+                                            class="w-full group relative flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200
+                                                    {{ $hasSubActive 
+                                                        ? 'bg-navy-800 text-gold-400 font-semibold' 
+                                                        : 'text-navy-300 hover:text-white hover:bg-navy-800' }}"
+                                            :class="!sidebarOpen && 'justify-center'">
+                                            
+                                            @if($hasSubActive)
+                                                <div class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-gold-500 rounded-r-full -ml-3"></div>
                                             @endif
-                                        </a>
-                                    @endforeach
-                                </div>
-                            </div>
-                        @else
-                            {{-- Standard Menu Item --}}
-                            @php
-                                $isActive = $item['route'] && request()->routeIs($item['route'] . '*');
-                            @endphp
 
-                            <a href="{{ $item['route'] ? route($item['route']) : '#' }}"
-                                class="group relative flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200
-                                        {{ $isActive 
-                                            ? 'bg-gold-500 text-navy-900 shadow-lg shadow-gold-500/20' 
-                                            : 'text-navy-300 hover:text-white hover:bg-navy-800' }}"
-                                :class="!sidebarOpen && 'justify-center'">
-                                    
-                                    {{-- Active Indicator Bar --}}
-                                    @if($isActive)
-                                        <div class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-navy-900 rounded-r-full -ml-3"></div>
-                                    @endif
+                                            <svg class="w-5 h-5 flex-shrink-0 {{ $hasSubActive ? 'text-gold-500' : '' }}" 
+                                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $item['icon'] }}"/>
+                                            </svg>
 
-                                    <!-- Icon -->
-                                    <svg class="w-5 h-5 flex-shrink-0 {{ $isActive ? 'stroke-[2.5]' : '' }}" 
-                                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $item['icon'] }}"/>
-                                    </svg>
-
-                                    <!-- Label -->
-                                    <span x-show="sidebarOpen"
-                                        x-transition:enter="transition ease-out duration-200"
-                                        x-transition:enter-start="opacity-0 -translate-x-2"
-                                        x-transition:enter-end="opacity-100 translate-x-0"
-                                        class="text-sm font-medium whitespace-nowrap overflow-hidden">
-                                        {{ $item['label'] }}
-                                    </span>
-
-                                    {{-- Badge Low Stock --}}
-                                    @if($item['route'] === 'warehouse.low-stocks.index' && $lowStockCount > 0)
-                                        <span x-show="sidebarOpen"
-                                            class="ml-auto inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 text-[10px] font-bold rounded-full bg-red-500 text-white">
-                                            {{ $lowStockCount }}
-                                        </span>
-                                    @endif
-
-                                    <!-- Tooltip (saat collapsed) -->
-                                    <div x-show="!sidebarOpen"
-                                        class="absolute left-full ml-3 px-3 py-1.5 bg-navy-800 text-white text-xs font-medium rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap transition-opacity z-50 shadow-xl border border-navy-700">
-                                        {{ $item['label'] }}
-                                        @if($item['route'] === 'warehouse.low-stocks.index' && $lowStockCount > 0)
-                                            <span class="ml-2 inline-flex items-center justify-center min-w-[18px] h-4 px-1 text-[10px] font-bold rounded-full bg-red-500 text-white">
-                                                {{ $lowStockCount }}
+                                            <span x-show="sidebarOpen"
+                                                x-transition:enter="transition ease-out duration-200"
+                                                x-transition:enter-start="opacity-0 -translate-x-2"
+                                                x-transition:enter-end="opacity-100 translate-x-0"
+                                                class="text-sm font-medium whitespace-nowrap overflow-hidden flex-1 text-left">
+                                                {{ $item['label'] }}
                                             </span>
-                                        @endif
-                                        <div class="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1 w-2 h-2 bg-navy-800 rotate-45 border-l border-b border-navy-700"></div>
+
+                                            <svg x-show="sidebarOpen" 
+                                                class="w-4 h-4 text-navy-400 transition-transform duration-200 flex-shrink-0"
+                                                :class="open ? 'rotate-180 text-gold-500' : ''"
+                                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                            </svg>
+
+                                            <div x-show="!sidebarOpen"
+                                                class="absolute left-full ml-3 px-3 py-1.5 bg-navy-800 text-white text-xs font-medium rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap transition-opacity z-50 shadow-xl border border-navy-700">
+                                                {{ $item['label'] }}
+                                                <div class="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1 w-2 h-2 bg-navy-800 rotate-45 border-l border-b border-navy-700"></div>
+                                            </div>
+                                        </button>
+
+                                        <div x-show="open && sidebarOpen" 
+                                             x-transition:enter="transition ease-out duration-150"
+                                             x-transition:enter-start="opacity-0 -translate-y-1"
+                                             x-transition:enter-end="opacity-100 translate-y-0"
+                                             class="pl-8 pr-2 py-1 space-y-1">
+                                            @foreach($item['submenu'] as $subItem)
+                                                
+                                                @if(isset($subItem['permission']) && !auth()->user()->can($subItem['permission']))
+                                                    @continue
+                                                @endif
+
+                                                @if($subItem['label'] === 'Roles' && !auth()->user()->hasRole('Owner'))
+                                                    @continue
+                                                @endif
+
+                                                @php
+                                                    $isSubActive = $subItem['route'] && request()->routeIs($subItem['route'] . '*');
+                                                    $subLabel = strtolower($subItem['label']);
+                                                @endphp
+
+                                                <a href="{{ $subItem['route'] ? route($subItem['route']) : '#' }}"
+                                                   x-show="searchMenu === '' || '{{ $subLabel }}'.includes(searchMenu.toLowerCase())"
+                                                   class="flex items-center justify-between px-3 py-1.5 rounded-lg text-xs font-medium transition
+                                                          {{ $isSubActive 
+                                                              ? 'bg-gold-500 text-navy-900 font-bold shadow-sm' 
+                                                              : ($subItem['route'] ? 'text-navy-300 hover:text-white hover:bg-navy-800/60' : 'text-navy-500 cursor-not-allowed') }}">
+                                                    <span>{{ $subItem['label'] }}</span>
+                                                    @if(!$subItem['route'])
+                                                        <span class="text-[9px] uppercase tracking-wider px-1 py-0.5 rounded bg-navy-800 text-navy-500 border border-navy-700">Nanti</span>
+                                                    @endif
+                                                </a>
+                                            @endforeach
+                                        </div>
                                     </div>
-                                </a>
-                        @endif
-                    @endforeach
-                </nav>
+                                @else
+                                    {{-- Standard Menu Item --}}
+                                    @php
+                                        $isActive = $item['route'] && request()->routeIs($item['route'] . '*');
+                                    @endphp
+
+                                    <a href="{{ $item['route'] ? route($item['route']) : '#' }}"
+                                        class="group relative flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200
+                                                {{ $isActive 
+                                                    ? 'bg-gold-500 text-navy-900 shadow-lg shadow-gold-500/20' 
+                                                    : 'text-navy-300 hover:text-white hover:bg-navy-800' }}"
+                                        :class="!sidebarOpen && 'justify-center'">
+                                            
+                                            @if($isActive)
+                                                <div class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-navy-900 rounded-r-full -ml-3"></div>
+                                            @endif
+
+                                            <svg class="w-5 h-5 flex-shrink-0 {{ $isActive ? 'stroke-[2.5]' : '' }}" 
+                                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $item['icon'] }}"/>
+                                            </svg>
+
+                                            <span x-show="sidebarOpen"
+                                                x-transition:enter="transition ease-out duration-200"
+                                                x-transition:enter-start="opacity-0 -translate-x-2"
+                                                x-transition:enter-end="opacity-100 translate-x-0"
+                                                class="text-sm font-medium whitespace-nowrap overflow-hidden">
+                                                {{ $item['label'] }}
+                                            </span>
+
+                                            @if($item['route'] === 'warehouse.low-stocks.index' && $lowStockCount > 0)
+                                                <span x-show="sidebarOpen"
+                                                    class="ml-auto inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 text-[10px] font-bold rounded-full bg-red-500 text-white">
+                                                    {{ $lowStockCount }}
+                                                </span>
+                                            @endif
+
+                                            <div x-show="!sidebarOpen"
+                                                class="absolute left-full ml-3 px-3 py-1.5 bg-navy-800 text-white text-xs font-medium rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap transition-opacity z-50 shadow-xl border border-navy-700">
+                                                {{ $item['label'] }}
+                                                @if($item['route'] === 'warehouse.low-stocks.index' && $lowStockCount > 0)
+                                                    <span class="ml-2 inline-flex items-center justify-center min-w-[18px] h-4 px-1 text-[10px] font-bold rounded-full bg-red-500 text-white">
+                                                        {{ $lowStockCount }}
+                                                    </span>
+                                                @endif
+                                                <div class="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1 w-2 h-2 bg-navy-800 rotate-45 border-l border-b border-navy-700"></div>
+                                            </div>
+                                        </a>
+                                @endif
+                            </div>
+                        @endforeach
+                    </nav>
+                </div>
 
                 <!-- USER PROFILE (Bawah) -->
-                <div class="border-t border-navy-800 p-3" x-data="{ userMenuOpen: false }">
+                <div class="border-t border-navy-800 p-3 flex-shrink-0" x-data="{ userMenuOpen: false }">
                     <div class="relative">
-                        <!-- User Button -->
                         <button @click="userMenuOpen = !userMenuOpen" 
                                 class="w-full flex items-center gap-3 px-2 py-2 rounded-lg hover:bg-navy-800 transition"
                                 :class="!sidebarOpen && 'justify-center'">
@@ -329,7 +363,6 @@
                             </svg>
                         </button>
 
-                        <!-- Dropdown Menu -->
                         <div x-show="userMenuOpen" 
                             @click.away="userMenuOpen = false"
                             x-cloak
@@ -364,9 +397,8 @@
             <!-- ============================================ -->
             <!-- MAIN CONTENT -->
             <!-- ============================================ -->
-            <div class="flex-1 flex flex-col min-w-0">
+            <div class="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
                 
-                <!-- TOP NAVBAR -->
                 <header class="h-20 bg-navy-950/80 backdrop-blur border-b border-navy-800 px-8 flex items-center justify-between flex-shrink-0">
                     <div>
                         <p class="text-[10px] font-semibold text-gold-500 uppercase tracking-widest mb-0.5">Atelier</p>
@@ -375,13 +407,11 @@
                         </h2>
                     </div>
                     <div class="flex items-center gap-4">
-                        <!-- Date -->
                         <div class="text-right hidden md:block">
                             <p class="text-xs text-navy-400">{{ now()->translatedFormat('l, d F Y') }}</p>
                             <p class="text-sm font-medium text-gold-500">{{ now()->format('H:i') }} WIB</p>
                         </div>
                         
-                        <!-- Notification -->
                         <div class="relative" x-data="{ open: false }">
                             <button @click="open = !open"
                                     class="relative w-10 h-10 rounded-lg bg-navy-900 border border-navy-800 text-navy-400 hover:text-gold-500 hover:border-gold-500/50 transition flex items-center justify-center">
@@ -427,12 +457,10 @@
                     </div>
                 </header>
 
-                <!-- PAGE CONTENT -->
                 <main class="flex-1 overflow-y-auto">
                     {{ $slot }}
                 </main>
 
-                <!-- FOOTER -->
                 <footer class="bg-navy-950 border-t border-navy-800 px-8 py-3 text-center text-xs text-navy-500 flex-shrink-0">
                     &copy; {{ date('Y') }} Atelier — L'atelier de votre production.
                 </footer>
