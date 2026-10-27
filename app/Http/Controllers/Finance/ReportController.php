@@ -226,4 +226,70 @@ class ReportController extends Controller
 
         return view('finance.reports.aging-ar', compact('grouped', 'asOfDate', 'grandTotal'));
     }
+
+        public function agingAp(Request $request)
+    {
+        // Default tanggal: hari ini
+        $asOfDate = $request->input('as_of_date', now()->toDateString());
+
+        // Ambil semua AP yang belum lunas
+        $apBills = \App\Models\Finance\ApBill::with('supplier')
+            ->whereIn('status', ['open', 'partial'])
+            ->get();
+
+        // Kelompokkan per supplier
+        $grouped = $apBills->groupBy('supplier_id')->map(function ($items) use ($asOfDate) {
+            $supplier = $items->first()->supplier;
+            
+            $buckets = [
+                'current' => 0, // Belum jatuh tempo
+                '1_30'    => 0,
+                '31_60'   => 0,
+                '61_90'   => 0,
+                'over_90' => 0,
+            ];
+
+            foreach ($items as $ap) {
+                $outstanding = (float) ($ap->total_amount - $ap->paid_amount);
+                $dueDate = \Carbon\Carbon::parse($ap->due_date);
+                $asOf = \Carbon\Carbon::parse($asOfDate);
+                
+                $daysOverdue = $dueDate->diffInDays($asOf, false); 
+
+                if ($daysOverdue <= 0) {
+                    $buckets['current'] += $outstanding;
+                } elseif ($daysOverdue <= 30) {
+                    $buckets['1_30'] += $outstanding;
+                } elseif ($daysOverdue <= 60) {
+                    $buckets['31_60'] += $outstanding;
+                } elseif ($daysOverdue <= 90) {
+                    $buckets['61_90'] += $outstanding;
+                } else {
+                    $buckets['over_90'] += $outstanding;
+                }
+            }
+
+            return [
+                'supplier' => $supplier,
+                'current'  => $buckets['current'],
+                '1_30'     => $buckets['1_30'],
+                '31_60'    => $buckets['31_60'],
+                '61_90'    => $buckets['61_90'],
+                'over_90'  => $buckets['over_90'],
+                'total'    => array_sum($buckets),
+            ];
+        })->sortByDesc('total');
+
+        // Grand Total
+        $grandTotal = [
+            'current' => $grouped->sum('current'),
+            '1_30'    => $grouped->sum('1_30'),
+            '31_60'   => $grouped->sum('31_60'),
+            '61_90'   => $grouped->sum('61_90'),
+            'over_90' => $grouped->sum('over_90'),
+            'total'   => $grouped->sum('total'),
+        ];
+
+        return view('finance.reports.aging-ap', compact('grouped', 'asOfDate', 'grandTotal'));
+    }
 }

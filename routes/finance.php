@@ -28,5 +28,6 @@ Route::middleware(['auth', 'verified', 'can:view finance'])->prefix('finance')->
     Route::get('reports/trial-balance', [ReportController::class, 'trialBalance'])->name('reports.trial-balance');
     Route::get('reports/general-ledger', [ReportController::class, 'generalLedger'])->name('reports.general-ledger');
     Route::get('reports/aging-ar', [ReportController::class, 'agingAr'])->name('reports.aging-ar');
+        Route::get('reports/aging-ap', [ReportController::class, 'agingAp'])->name('reports.aging-ap');
     
 });
