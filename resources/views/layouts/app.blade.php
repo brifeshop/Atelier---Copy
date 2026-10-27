@@ -173,11 +173,15 @@
                         @endphp
 
                         @foreach($menuItems as $item)
+                            {{-- FILTER PERMISSION FINANCE DI SINI --}}
+                            @if(isset($item['group']) && $item['group'] === 'Finance' && !auth()->user()->can('view finance'))
+                                @continue
+                            @endif
+
                             @php
                                 $label = strtolower($item['label']);
                                 $group = isset($item['group']) && $item['group'] ? strtolower($item['group']) : '';
                                 
-                                // Siapkan daftar string submenu untuk pengecekan pencarian di Alpine.js
                                 $submenuLabels = [];
                                 if (isset($item['submenu'])) {
                                     foreach ($item['submenu'] as $sub) {

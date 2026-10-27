@@ -7,7 +7,7 @@ use App\Http\Controllers\Finance\ApBillController;
 use Illuminate\Support\Facades\Route;
 
 
-Route::middleware(['auth', 'verified'])->prefix('finance')->name('finance.')->group(function () {
+Route::middleware(['auth', 'verified', 'can:view finance'])->prefix('finance')->name('finance.')->group(function () {
     Route::get('/', [FinanceDashboardController::class, 'index'])->name('dashboard');
 
     Route::get('ar', [ArInvoiceController::class, 'index'])->name('ar.index');
@@ -24,4 +24,5 @@ Route::middleware(['auth', 'verified'])->prefix('finance')->name('finance.')->gr
         // Payment Out (Supplier)
     Route::get('payments/create/out', [PaymentController::class, 'createOut'])->name('payments.create-out');
     Route::post('payments/out', [PaymentController::class, 'storeOut'])->name('payments.store-out');
+    
 });
