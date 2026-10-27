@@ -83,4 +83,81 @@ class ReportController extends Controller
             'summary'
         ));
     }
+        public function generalLedger(Request $request)
+    {
+        $startDate = $request->input('start_date', now()->startOfMonth()->toDateString());
+        $endDate   = $request->input('end_date', now()->toDateString());
+        $accountId = $request->input('account_id');
+
+        $accounts = ChartOfAccount::where('is_header', false)
+            ->where('is_active', true)
+            ->orderBy('code')
+            ->get();
+
+        $selectedAccount = null;
+        $mutations = collect();
+        $saldoAwal = 0;
+        $saldoAkhir = 0;
+
+        if ($accountId) {
+            $selectedAccount = ChartOfAccount::findOrFail($accountId);
+
+            // Hitung Saldo Awal (sebelum start_date)
+            $awalQuery = DB::table('journal_items')
+                ->join('journals', 'journal_items.journal_id', '=', 'journals.id')
+                ->where('journals.status', 'posted')
+                ->where('journal_items.account_id', $accountId)
+                ->where('journals.journal_date', '<', $startDate . ' 00:00:00')
+                ->selectRaw('SUM(debit) as total_debit, SUM(credit) as total_credit')
+                ->first();
+
+            $awalDebit  = $awalQuery ? (float) $awalQuery->total_debit : 0;
+            $awalCredit = $awalQuery ? (float) $awalQuery->total_credit : 0;
+
+            if ($selectedAccount->normal_balance === 'debit') {
+                $saldoAwal = $awalDebit - $awalCredit;
+            } else {
+                $saldoAwal = $awalCredit - $awalDebit;
+            }
+
+            // Ambil Mutasi (dalam rentang tanggal)
+            $mutations = DB::table('journal_items')
+                ->join('journals', 'journal_items.journal_id', '=', 'journals.id')
+                ->where('journals.status', 'posted')
+                ->where('journal_items.account_id', $accountId)
+                ->whereBetween('journals.journal_date', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
+                ->select(
+                    'journals.journal_date',
+                    'journals.journal_number',
+                    'journals.description',
+                    'journal_items.debit',
+                    'journal_items.credit',
+                    'journal_items.memo'
+                )
+                ->orderBy('journals.journal_date', 'asc')
+                ->orderBy('journals.id', 'asc')
+                ->get();
+
+            // Hitung Saldo Akhir (running balance akan dihitung di view)
+            $totalDebit  = $mutations->sum('debit');
+            $totalCredit = $mutations->sum('credit');
+
+            if ($selectedAccount->normal_balance === 'debit') {
+                $saldoAkhir = $saldoAwal + ($totalDebit - $totalCredit);
+            } else {
+                $saldoAkhir = $saldoAwal + ($totalCredit - $totalDebit);
+            }
+        }
+
+        return view('finance.reports.general-ledger', compact(
+            'accounts',
+            'selectedAccount',
+            'accountId',
+            'mutations',
+            'startDate',
+            'endDate',
+            'saldoAwal',
+            'saldoAkhir'
+        ));
+    }
 }

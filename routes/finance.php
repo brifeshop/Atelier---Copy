@@ -26,5 +26,6 @@ Route::middleware(['auth', 'verified', 'can:view finance'])->prefix('finance')->
     Route::get('payments/create/out', [PaymentController::class, 'createOut'])->name('payments.create-out');
     Route::post('payments/out', [PaymentController::class, 'storeOut'])->name('payments.store-out');
     Route::get('reports/trial-balance', [ReportController::class, 'trialBalance'])->name('reports.trial-balance');
+        Route::get('reports/general-ledger', [ReportController::class, 'generalLedger'])->name('reports.general-ledger');
     
 });
