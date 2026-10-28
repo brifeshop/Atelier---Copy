@@ -200,7 +200,7 @@ class GoodsReceiptController extends Controller
      * - Panggil StockMovementService::recordIn() untuk setiap item
      * - Update status PO (partial / received)
      */
-        public function receive(GoodsReceipt $goodsReceipt)
+            public function receive(GoodsReceipt $goodsReceipt)
     {
         if (!$goodsReceipt->canReceive()) {
             return back()->with('error', 'GR tidak bisa dikonfirmasi.');
@@ -210,14 +210,20 @@ class GoodsReceiptController extends Controller
         try {
             $goodsReceipt->load('items');
 
+            // Cari lokasi Karantina QC (ID 38)
+            $locKarantina = \App\Models\Warehouse\Location::where('kode', 'QC-KARANTINA')->first();
+            if (!$locKarantina) {
+                throw new \Exception('Lokasi Karantina QC belum disetup. Jalankan seeder WarehouseQcSeeder.');
+            }
+
             foreach ($goodsReceipt->items as $grItem) {
                 if ($grItem->qty_received <= 0) continue;
 
-                // 1. Panggil Stock Movement (IN)
+                // 1. Panggil Stock Movement (IN) ke Karantina (bukan ke lokasi asli)
                 StockMovementService::recordIn(
                     'material',
                     $grItem->material_id,
-                    $grItem->location_id,
+                    $locKarantina->id, // <-- OVERRIDE LOKASI
                     (float) $grItem->qty_received,
                     [
                         'unit_price' => (float) $grItem->unit_price,
@@ -225,7 +231,7 @@ class GoodsReceiptController extends Controller
                         'reference_id' => $goodsReceipt->id,
                         'reference_number' => $goodsReceipt->gr_number,
                         'date' => $goodsReceipt->date->toDateString(),
-                        'notes' => "Penerimaan dari GR {$goodsReceipt->gr_number}",
+                        'notes' => "Penerimaan (Karantina IQC) dari GR {$goodsReceipt->gr_number}",
                     ]
                 );
 
@@ -241,22 +247,24 @@ class GoodsReceiptController extends Controller
                 'received_at' => now(),
             ]);
 
-            // ========================================================
-            // TAMBAHAN BARU: AUTO-CREATE AP (HUTANG) DARI GR INI
-            // ========================================================
+            // 4. Auto-create AP
             try {
                 \App\Services\Finance\ApService::createFromGoodsReceipt($goodsReceipt);
             } catch (\Exception $e) {
                 \Log::error('Gagal auto-create AP untuk GR ' . $goodsReceipt->gr_number . ': ' . $e->getMessage());
             }
-            // ========================================================
 
-            // Kirim notifikasi ke Purchasing kalau ada reject
+            // 5. Auto-create QC Inspection (Pending)
+            try {
+                \App\Services\QcInspectionService::createFromGoodsReceipt($goodsReceipt);
+            } catch (\Exception $e) {
+                \Log::error('Gagal auto-create QC untuk GR ' . $goodsReceipt->gr_number . ': ' . $e->getMessage());
+            }
+
+            // 6. Notifikasi Reject (jika ada)
             $rejects = $goodsReceipt->items->filter(fn($i) => $i->qty_rejected > 0);
-
             if ($rejects->count() > 0) {
                 $purchasingUsers = \App\Models\User::role('Purchasing')->get();
-                
                 foreach ($purchasingUsers as $user) {
                     $user->notify(new \App\Notifications\GoodsRejectNotification(
                         $goodsReceipt,
@@ -267,17 +275,14 @@ class GoodsReceiptController extends Controller
                     ));
                 }
             }
-            // 4. Update status PO
+
+            // 7. Update status PO
             $po = $goodsReceipt->purchaseOrder;
             if ($po) {
                 $po->refresh();
                 $allReceived = $po->items->every(fn($i) => $i->received_qty >= $i->qty);
-
                 if ($allReceived) {
-                    $po->update([
-                        'status' => 'received',
-                        'received_at' => now(),
-                    ]);
+                    $po->update(['status' => 'received', 'received_at' => now()]);
                 } else {
                     $po->update(['status' => 'partial']);
                 }
@@ -287,7 +292,7 @@ class GoodsReceiptController extends Controller
 
             return redirect()
                 ->route('purchasing.goods-receipts.show', $goodsReceipt)
-                ->with('success', "GR {$goodsReceipt->gr_number} berhasil dikonfirmasi. Stok sudah bertambah & Hutang (AP) tercatat.");
+                ->with('success', "GR {$goodsReceipt->gr_number} diterima. Barang masuk ke Karantina IQC. Silakan cek menu QC Incoming.");
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->with('error', 'Gagal konfirmasi GR: ' . $e->getMessage());

@@ -236,6 +236,11 @@ Route::middleware(['auth', 'verified'])->prefix('purchasing')->name('purchasing.
     Route::get('api/supplier-price', [SupplierPriceController::class, 'getPrice'])->name('api.supplier-price');
 
     Route::resource('supplier-evaluations', SupplierEvaluationController::class);
+
+        // QC Inspection
+    Route::get('qc-inspections', [\App\Http\Controllers\Purchasing\QcInspectionController::class, 'index'])->name('qc-inspections.index');
+    Route::get('qc-inspections/{qcInspection}', [\App\Http\Controllers\Purchasing\QcInspectionController::class, 'show'])->name('qc-inspections.show');
+    Route::patch('qc-inspections/{qcInspection}/complete', [\App\Http\Controllers\Purchasing\QcInspectionController::class, 'complete'])->name('qc-inspections.complete');
 });
 
 // ==================== NOTIFICATIONS ====================
